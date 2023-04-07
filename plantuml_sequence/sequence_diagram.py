@@ -162,6 +162,44 @@ class SequenceDiagram:
         finally:
             self._arrow_style = old_arrow_style
 
+    def autonumber(self, start: int | None = None, increment: int | None = None) -> Self:
+        """
+        Enable auto numbering for messages
+
+        :param start: Initial number, defaults to None which means 1
+        :type start: int | None, optional
+        :param increment: Increment per message, defaults to None which means 1
+        :type increment: int | None, optional
+        """
+
+        start_suffix = ""
+        increment_suffix = ""
+        if start is None:
+            if increment is not None:
+                raise ValueError("Cannot set autonumber increment without start")
+        else:
+            start_suffix = f" {start}"
+            if increment is not None:
+                increment_suffix = f" {increment}"
+
+        self._line_writer.writeline(f"autonumber{start_suffix}{increment_suffix}")
+        return self
+
+    def autonumber_stop(self) -> Self:
+        """Stop auto numbering for messages"""
+        self._line_writer.writeline("autonumber stop")
+        return self
+
+    def autonumber_resume(self, increment: int | None = None) -> Self:
+        """
+        Resume previously stopped auto numbering with an optional new increment
+
+        :param increment: New increment to use, defaults to None
+        """
+        inc = str(increment) if increment is not None else ""
+        self._line_writer.writeline(f"autonumber resume {inc}")
+        return self
+
 
 def participant_to_string(participant: Participant | str | None) -> str:
     """

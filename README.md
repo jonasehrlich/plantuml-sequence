@@ -16,10 +16,10 @@ Create plantuml sequence charts from Python
 ### Messages
 
 * [x] Messages
-* [ ] Basic `autonumber` message numbering
+* [x] Basic `autonumber` message numbering
 * [ ] Advanced auto numbering
   * [ ] `autonumber` formats
-  * [ ] `autonumber` sequences
+  * [ ] `autonumber` sequence increments
 * [ ] Hide unlinked participants
 * [ ] Mainframe
 
@@ -43,8 +43,8 @@ Create plantuml sequence charts from Python
 ### Styling
 
 * [ ] Colored groups
-* [ ] Arrow style change
-  * [ ] Standard arrow styles
+* [x] Arrow style change
+  * [x] Standard arrow styles
   * [ ] Short arrows
 * [ ] Slanted arrows
 * [ ] Styling changes using the [`skinparam`](https://plantuml.com/skinparam) command

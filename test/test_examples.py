@@ -1,3 +1,5 @@
+import pytest
+
 from plantuml_sequence import SequenceDiagram
 from plantuml_sequence.utils import string_io
 
@@ -113,7 +115,7 @@ Alice <- Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\n
         assert content == expected_output
 
 
-def test_arrow_style_contextmanager():
+def test_arrow_style_contextmanager() -> None:
     """Test the contextmanager to change the arrow style"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         for arrow_style in ("->x", "->", "->>", "-\\", "\\\\-", "//--", "->o", "o\\\\--", "<->", "<->o"):
@@ -132,6 +134,108 @@ Bob ->o Alice
 Bob o\\\\-- Alice
 Bob <-> Alice
 Bob <->o Alice
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_message_sequence_numbering_basic() -> None:
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        sequence.autonumber()
+        sequence.message("Bob", "Alice", "Authentication Request")
+        sequence.message("Bob", "Alice", "Authentication Response", arrow_style="<-")
+    expected_output = """\
+@startuml
+autonumber
+Bob -> Alice: Authentication Request
+Bob <- Alice: Authentication Response
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_message_sequence_numbering_increment() -> None:
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        sequence.autonumber()
+        sequence.message("Bob", "Alice", "Authentication Request")
+        sequence.message("Bob", "Alice", "Authentication Response", arrow_style="<-")
+        sequence.empty_line()
+        sequence.autonumber(start=15)
+        sequence.message("Bob", "Alice", "Another authentication Request")
+        sequence.message("Bob", "Alice", "Another authentication Response", arrow_style="<-")
+        sequence.empty_line()
+        sequence.autonumber(start=40, increment=10)
+        sequence.message("Bob", "Alice", "Yet another authentication Request")
+        sequence.message("Bob", "Alice", "Yet another authentication Response", arrow_style="<-")
+        sequence.empty_line()
+    expected_output = """\
+@startuml
+autonumber
+Bob -> Alice: Authentication Request
+Bob <- Alice: Authentication Response
+
+autonumber 15
+Bob -> Alice: Another authentication Request
+Bob <- Alice: Another authentication Response
+
+autonumber 40 10
+Bob -> Alice: Yet another authentication Request
+Bob <- Alice: Yet another authentication Response
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_message_sequence_numbering_increment_no_start_value() -> None:
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence, pytest.raises(ValueError):
+        sequence.autonumber(increment=1)
+
+
+def test_message_sequence_numbering_stop_resume() -> None:
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        (
+            sequence.autonumber(10, 10)
+            .message("Bob", "Alice", "Authentication Request")
+            .message("Bob", "Alice", "Authentication Response", arrow_style="<-")
+            .empty_line()
+            .autonumber_stop()
+            .message("Bob", "Alice", "dummy")
+            .empty_line()
+            .autonumber_resume()
+            .message("Bob", "Alice", "Yet another authentication Request")
+            .message("Bob", "Alice", "Yet another authentication Response", arrow_style="<-")
+            .empty_line()
+            .autonumber_stop()
+            .message("Bob", "Alice", "dummy")
+            .empty_line()
+            .autonumber_resume(increment=1)
+            .message("Bob", "Alice", "Yet another authentication Request")
+            .message("Bob", "Alice", "Yet another authentication Response", arrow_style="<-")
+        )
+
+    expected_output = """\
+@startuml
+autonumber 10 10
+Bob -> Alice: Authentication Request
+Bob <- Alice: Authentication Response
+
+autonumber stop
+Bob -> Alice: dummy
+
+autonumber resume
+Bob -> Alice: Yet another authentication Request
+Bob <- Alice: Yet another authentication Response
+
+autonumber stop
+Bob -> Alice: dummy
+
+autonumber resume 1
+Bob -> Alice: Yet another authentication Request
+Bob <- Alice: Yet another authentication Response
 @enduml
 """
     content = file_like.read()
