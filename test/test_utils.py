@@ -51,6 +51,15 @@ def test_line_writer_indent() -> None:
     assert output_lines == expected_output
 
 
+def test_line_writer_trailing_whitespace():
+    word = "  hello  "
+    with utils.string_io() as file_like:
+        line_writer = utils.LineWriter(file_like)
+        line_writer.writeline(word)
+    lines = list(filter(lambda line: line, file_like.read().splitlines()))
+    assert lines == [word.strip()]
+
+
 def test_cwd_contextmanager() -> None:
     """Test the cwd contextmanager"""
     old_cwd = pathlib.Path.cwd()

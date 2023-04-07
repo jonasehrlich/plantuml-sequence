@@ -60,7 +60,7 @@ class LineWriter:
 
     def writeline(self, line: str) -> None:
         """Write a line to the enclosed file-like object"""
-        self._file.write(textwrap.indent(line, prefix=self._prefix))
+        self._file.write(textwrap.indent(line.strip(), prefix=self._prefix))
         self._file.write("\n")
 
     def writelines(self, lines: collections.abc.Iterable[str]) -> None:
