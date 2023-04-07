@@ -354,3 +354,30 @@ deactivate A
 """
     content = file_like.read()
     assert content == expected_output
+
+
+def test_delay():
+    """Test notation of delays"""
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        sequence.empty_line().message("Alice", "Bob", "Authentication Request").delay()
+        with sequence.arrow_style("-->"):
+            (
+                sequence.message("Bob", "Alice", "Authentication Response")
+                .delay("5 minutes later")
+                .message("Bob", "Alice", "Good Bye !")
+                .empty_line()
+            )
+
+    expected_output = """\
+@startuml
+
+Alice -> Bob: Authentication Request
+...
+Bob --> Alice: Authentication Response
+...5 minutes later...
+Bob --> Alice: Good Bye !
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output

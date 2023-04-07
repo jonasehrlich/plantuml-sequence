@@ -38,7 +38,7 @@ Create plantuml sequence charts from Python
 * [ ] `alt` / `else` groups
 * [ ] Divider
 * [ ] Reference
-* [ ] Delay
+* [x] Delay
 * [ ] Space
 
 ### Styling

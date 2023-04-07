@@ -241,10 +241,18 @@ class SequenceDiagram:
             action = "destroy" if destroy else "deactivate"
             self._line_writer.writeline(f"{action} {alias}")
 
-    def delay(self, msg: str = ""):
-        """Indicate a delay in the diagram"""
+    def delay(self, msg: str | None = None) -> Self:
+        """
+        Indicate a delay in the diagram
+
+        :param msg: Message to add to the delay, defaults to None
+        :type msg: str | None, optional
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
         line = f"...{msg}..." if msg else "..."
         self._line_writer.writeline(line)
+        return self
 
 
 def participant_to_string(participant: Participant | str | None) -> str:
