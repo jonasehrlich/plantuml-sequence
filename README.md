@@ -9,7 +9,8 @@ Create plantuml sequence charts from Python
 * [x] Declaring participants
 * [ ] Multiline participants
 * [ ] Create participant with message
-* [ ] Lifeline activation / deactivation
+* [x] Lifeline activation / deactivation
+* [ ] Lifeline auto-activate
 * [ ] Participants encompass (Box around participants)
 * [ ] Remove foot boxes
 

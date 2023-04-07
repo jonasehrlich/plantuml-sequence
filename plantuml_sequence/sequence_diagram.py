@@ -36,7 +36,8 @@ class Participant:
 
     def __str__(self) -> str:
         quoted_title = utils.quote_string_if_required(utils.escape_newlines(self.title))
-        return f"{self.shape} {quoted_title} as {self.alias} {self.color}"
+        alias_suffix = "" if self.title == self.alias else f" as {self.alias}"
+        return f"{self.shape} {quoted_title}{alias_suffix} {self.color}"
 
 
 class SequenceDiagram:
@@ -215,6 +216,35 @@ class SequenceDiagram:
         title = utils.escape_newlines(title) if title is not None else ""
         self._line_writer.writeline(f"newpage {title}")
         return self
+
+    @contextlib.contextmanager
+    def activate_lifeline(
+        self, participant: Participant | str, color: str = "", destroy: bool = False
+    ) -> collections.abc.Generator[Self, None, None]:
+        """
+        Contextmanager to activate the lifeline of a participant
+
+        :param participant: Participant to activate
+        :type participant: Participant | str
+        :param color: Color of the active lifeline, defaults to ""
+        :type color: str, optional
+        :param destroy: Whether to destroy or deactivate the lifeline at the end of the context, defaults to False
+        :type destroy: bool, optional
+        :yield: Sequence diagram instance
+        :rtype: Iterator[collections.abc.Generator[Self, None, None]]
+        """
+        alias = participant_to_string(participant)
+        self._line_writer.writeline(f"activate {alias} {color}")
+        try:
+            yield self
+        finally:
+            action = "destroy" if destroy else "deactivate"
+            self._line_writer.writeline(f"{action} {alias}")
+
+    def delay(self, msg: str = ""):
+        """Indicate a delay in the diagram"""
+        line = f"...{msg}..." if msg else "..."
+        self._line_writer.writeline(line)
 
 
 def participant_to_string(participant: Participant | str | None) -> str:

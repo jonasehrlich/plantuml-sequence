@@ -82,8 +82,8 @@ def test_declaring_participant_background_color_long_names() -> None:
     content = file_like.read()
     expected_output = """\
 @startuml
-actor Bob as Bob #red
-participant Alice as Alice
+actor Bob #red
+participant Alice
 participant "I have a really\\nlong name" as L #99FF99
 
 Alice -> Bob: Authentication Request
@@ -269,6 +269,87 @@ newpage A title for the\\nlast page
 
 Alice -> Bob: message 5
 Alice -> Bob: message 6
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_activate_lifeline() -> None:
+    """Test lifeline activation and deactivation"""
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        user = sequence.declare_participant("User")
+        sequence.empty_line().message(user, "A", "DoWork")
+        with sequence.activate_lifeline("A"):
+            sequence.empty_line().message("A", "B", "<< createRequest >>")
+            with sequence.activate_lifeline("B"):
+                sequence.empty_line().message("B", "C", "DoWork")
+                with sequence.activate_lifeline("C", destroy=True), sequence.arrow_style("-->"):
+                    sequence.message("C", "B", "WorkDone")
+                sequence.empty_line().message("B", "A", "RequestCreated", arrow_style="-->")
+            sequence.empty_line().message("A", user, "Done")
+        sequence.empty_line()
+
+    expected_output = """\
+@startuml
+participant User
+
+User -> A: DoWork
+activate A
+
+A -> B: << createRequest >>
+activate B
+
+B -> C: DoWork
+activate C
+C --> B: WorkDone
+destroy C
+
+B --> A: RequestCreated
+deactivate B
+
+A -> User: Done
+deactivate A
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_activate_lifeline_with_colors() -> None:
+    """Test lifeline activation with colors"""
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        user = sequence.declare_participant("User")
+        sequence.empty_line().message(user, "A", "DoWork")
+        with sequence.activate_lifeline("A", color="#FFBBBB"):
+            sequence.empty_line().message("A", "A", "Internal call")
+            with sequence.activate_lifeline("A", color="#DarkSalmon"):
+                sequence.empty_line().message("A", "B", "<< createRequest >>")
+                with sequence.activate_lifeline("B"), sequence.arrow_style("-->"):
+                    sequence.empty_line().message("B", "A", "RequestCreated")
+            sequence.message("A", user, "Done")
+        sequence.empty_line()
+
+    expected_output = """\
+@startuml
+participant User
+
+User -> A: DoWork
+activate A #FFBBBB
+
+A -> A: Internal call
+activate A #DarkSalmon
+
+A -> B: << createRequest >>
+activate B
+
+B --> A: RequestCreated
+deactivate B
+deactivate A
+A -> User: Done
+deactivate A
+
 @enduml
 """
     content = file_like.read()
