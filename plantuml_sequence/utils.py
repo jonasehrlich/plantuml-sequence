@@ -42,6 +42,7 @@ else:  # pragma: no cover
             member._value_ = value
             return member
 
+        @staticmethod
         def _generate_next_value_(name: str, start: int, count: int, last_values: list[Any]) -> Any:
             """
             Return the lower-cased version of the member name.
