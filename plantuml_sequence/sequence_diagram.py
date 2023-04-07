@@ -1,11 +1,12 @@
 import dataclasses
 import functools
+import sys
 from types import TracebackType
 from typing import Literal, TextIO, Type, TypeAlias, TypeVar
 
-try:
+if sys.version_info >= (3, 11):
     from typing import Self
-except ImportError:
+else:
     from typing_extensions import Self
 
 from . import utils

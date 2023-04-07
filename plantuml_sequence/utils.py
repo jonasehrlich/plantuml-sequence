@@ -4,20 +4,19 @@ import enum
 import io
 import os
 import pathlib
+import sys
 import tempfile
 import textwrap
 from typing import Any, TextIO, TypeAlias
 
-try:
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
     from typing import Self
-except ImportError:
+else:  # pragma: no cover
     from typing_extensions import Self
 
-try:
-    from enum import StrEnum  # type: ignore [attr-defined]
-except ImportError:  # pragma: no cover
     # Backport of the StrEnum class from Python 3.11
-    class StrEnum(str, enum.Enum):  # type: ignore [no-redef]
+    class StrEnum(str, enum.Enum):
         """
         Enum where members are also (and must be) strings
         """
@@ -43,9 +42,7 @@ except ImportError:  # pragma: no cover
             member._value_ = value
             return member
 
-        def _generate_next_value_(  # type: ignore [override]
-            name: str, start: int, count: int, last_values: list[Any]
-        ) -> Any:
+        def _generate_next_value_(name: str, start: int, count: int, last_values: list[Any]) -> Any:
             """
             Return the lower-cased version of the member name.
             """
