@@ -1,2 +1,63 @@
 # plantuml-sequence
+
 Create plantuml sequence charts from Python
+
+## Features
+
+### Participants
+
+* [ ] Declaring participants
+* [ ] Multiline participants
+* [ ] Create participant with message
+* [ ] Lifeline activation / deactivation
+* [ ] Participants encompass (Box around participants)
+* [ ] Remove foot boxes
+
+### Messages
+
+* [ ] Messages
+* [ ] Basic `autonumber` message numbering
+* [ ] Advanced auto numbering
+  * [ ] `autonumber` formats
+  * [ ] `autonumber` sequences
+* [ ] Hide unlinked participants
+* [ ] Mainframe
+
+### Notes
+
+* [ ] Different note shapes (`note`, `hnote`, `rnote`)
+* [ ] Notes on messages
+* [ ] Notes over / left / right of lifelines
+* [ ] Notes across all participants
+* [ ] Multiple notes at the same level
+
+### Flow
+
+* [ ] Basic message grouping
+* [ ] `alt` / `else` groups
+* [ ] Divider
+* [ ] Reference
+* [ ] Delay
+* [ ] Space
+
+### Styling
+
+* [ ] Colored groups
+* [ ] Arrow style change
+  * [ ] Standard arrow styles
+  * [ ] Short arrows
+* [ ] Slanted arrows
+* [ ] Styling changes using the [`skinparam`](https://plantuml.com/skinparam) command
+
+### Preprocessing
+
+> Currently no preprocessing features are planned to be supported
+
+* [ ] Variable definition
+* [ ] Boolean expression
+* [ ] Conditions
+* [ ] While loops
+* [ ] Procedures & functions blocks
+* [ ] Include directive
+* [ ] Memory dump
+* [ ] Assertions
