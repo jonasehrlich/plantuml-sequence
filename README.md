@@ -39,14 +39,14 @@ Create plantuml sequence charts from Python
 * [ ] Divider
 * [ ] Reference
 * [x] Delay
-* [ ] Space
+* [x] Space
 
 ### Styling
 
 * [ ] Colored groups
 * [x] Arrow style change
   * [x] Standard arrow styles
-  * [ ] Short arrows
+  * [x] Short arrows
 * [ ] Slanted arrows
 * [ ] Styling changes using the [`skinparam`](https://plantuml.com/skinparam) command
 
