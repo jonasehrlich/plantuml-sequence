@@ -137,3 +137,8 @@ def quote_string_if_required(value: str):
     if value.isalnum():
         return value
     return f'"{value}"'
+
+
+def escape_newlines(val: str) -> str:
+    """Escape newline characters in a string"""
+    return val.replace("\n", "\\n")
