@@ -29,7 +29,7 @@ class Participant:
             object.__setattr__(self, "alias", "".join(filter(str.isalnum, self.title)))
 
     def __str__(self) -> str:
-        quoted_title = quote_string_if_required(self.title)
+        quoted_title = utils.quote_string_if_required(self.title)
         return f"{self.shape} {quoted_title} as {self.alias} {self.color}"
 
 
@@ -164,18 +164,4 @@ def participant_to_string(participant: Participant | str | None) -> str:
         return ""
     if isinstance(participant, Participant):
         return participant.alias
-    return quote_string_if_required(participant)
-
-
-def quote_string_if_required(value: str):
-    """
-    Quote a string if it is not purely alphanumeric
-
-    :param value: String to quote
-    :type value: str
-    :return: Quoted or unquoted string
-    :rtype: _type_
-    """
-    if value.isalnum():
-        return value
-    return f'"{value}"'
+    return utils.quote_string_if_required(participant)

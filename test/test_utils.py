@@ -30,7 +30,6 @@ def test_line_writer_writelines() -> None:
 
 
 def test_line_writer_indent() -> None:
-
     lines = ["123", "hello", "world", "lorem ipsum", "zero"]
     expected_output = [" " * num_spaces + item for num_spaces, item in zip((0, 2, 4, 2, 0), lines, strict=True)]
     lines_iter = iter(lines)
@@ -89,3 +88,19 @@ def test_temp_cwd_contextmanager() -> None:
         raise ValueError
     assert not temp_dir.exists()
     assert pathlib.Path.cwd() == old_cwd
+
+
+def test_string_quoting() -> None:
+    for value, quote_required in (
+        ("hello", False),
+        ("Hello World", True),
+        ("Bob()", True),
+        ("Foo.Bar", True),
+        ("foo_bar", True),
+        ("Foo-bar", True),
+    ):
+        quoted = utils.quote_string_if_required(value)
+        if quote_required:
+            assert quoted == f'"{value}"'
+        else:
+            assert quoted == value
