@@ -4,11 +4,12 @@ import enum
 import os
 import pathlib
 import tempfile
-from typing import Literal, TextIO, TypeAlias
+import textwrap
+from typing import Self, TextIO, TypeAlias
 
 try:
     from enum import StrEnum
-except ImportError:
+except ImportError:  # pragma: no cover
     # Backport of the StrEnum class from Python 3.11
     class StrEnum(str, enum.Enum):
         """
@@ -17,17 +18,17 @@ except ImportError:
 
         def __new__(cls, *values):
             "values must already be of type `str`"
-            if len(values) > 3:
+            if len(values) > 3:  # noqa: PLR2004
                 raise TypeError("too many arguments for str(): %r" % (values,))
             if len(values) == 1:
                 # it must be a string
                 if not isinstance(values[0], str):
                     raise TypeError("%r is not a string" % (values[0],))
-            if len(values) >= 2:
+            if len(values) >= 2:  # noqa: PLR2004
                 # check that encoding argument is a string
                 if not isinstance(values[1], str):
                     raise TypeError("encoding must be a string, not %r" % (values[1],))
-            if len(values) == 3:
+            if len(values) == 3:  # noqa: PLR2004
                 # check that errors argument is a string
                 if not isinstance(values[2], str):
                     raise TypeError("errors must be a string, not %r" % (values[2]))
@@ -52,24 +53,34 @@ StrPath: TypeAlias = os.PathLike | str
 class LineWriter:
     """Write a line-wise to a file and automatically add a line break"""
 
-    def __init__(
-        self, file_like: TextIO, line_break: Literal["\n", "\r\n"] = "\n", trim_trailing_whitespace: bool = True
-    ) -> None:
+    def __init__(self, file_like: TextIO) -> None:
         self._file = file_like
-        self._line_break = line_break
-        self._trim_trailing_whitespace = trim_trailing_whitespace
+        self._prefix = ""
 
     def writeline(self, line: str) -> None:
         """Write a line to the enclosed file-like object"""
-        if self._trim_trailing_whitespace:
-            line = line.rstrip()
-        self._file.write(line)
-        self._file.write(self._line_break)
+        self._file.write(textwrap.indent(line, prefix=self._prefix))
+        self._file.write("\n")
 
     def writelines(self, lines: collections.abc.Iterable[str]) -> None:
         """Write lines from an iterable to the enclosed file object"""
         for line in lines:
             self.writeline(line)
+
+    @contextlib.contextmanager
+    def indent(self, indent: int = 2) -> collections.abc.Generator[Self, None, None]:
+        """
+        Contextmanager to automatically indent inside the context
+
+        :param indent: Number of spaces to indent inside the context, defaults to 2
+        :yield: Modified line writer
+        """
+        old_prefix = self._prefix
+        self._prefix += " " * indent
+        try:
+            yield self
+        finally:
+            self._prefix = old_prefix
 
 
 @contextlib.contextmanager
