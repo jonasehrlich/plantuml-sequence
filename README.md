@@ -6,7 +6,7 @@ Create plantuml sequence charts from Python
 
 ### Participants
 
-* [ ] Declaring participants
+* [x] Declaring participants
 * [ ] Multiline participants
 * [ ] Create participant with message
 * [ ] Lifeline activation / deactivation
@@ -15,7 +15,7 @@ Create plantuml sequence charts from Python
 
 ### Messages
 
-* [ ] Messages
+* [x] Messages
 * [ ] Basic `autonumber` message numbering
 * [ ] Advanced auto numbering
   * [ ] `autonumber` formats
