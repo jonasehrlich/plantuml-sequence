@@ -21,9 +21,64 @@ black = "^23.1.0"
 ruff = "^0.0.256"
 pre-commit = "^3.1.1"
 pytest = "^7.2.2"
+pytest-cov = "^4.0.0"
+mypy = "^1.2.0"
+isort = "^5.12.0"
 
 [tool.black]
 line-length = 120
 
+[tool.coverage.report]
+exclude_also = [
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+    "^\\s+\\.\\.\\.",
+    # Don't complain about type check guarded imports
+    "if ((ty)(ping)?.)?TYPE_CHECKING:",
+]
+fail_under = 90
+
+[tool.coverage.run]
+branch = true
+source = ["plantuml_sequence"]
+
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.isort]
+profile = "black"
+line_length = 120
+src_paths = ["plantuml_sequence", "test"]
+
+[tool.mypy]
+strict = true
+
 [tool.ruff]
 line-length = 120
+select = [
+    "E",   # pycodestyle error rules
+    "F",   # pycodestyle warning rules
+    "B",   # flake8-bugbear rules
+    "S",   # flake8-bandit rules
+    "PTH", # flake8-use-pathlib
+    "PLC", # pylint convention rules
+    "PLR", # pylint refactor rules
+    "PLE", # pylint error rules
+    "PLW", # pylint warning rules
+    "C90", # mccabe complexity rules
+]
+
+[tool.ruff.per-file-ignores]
+# Disable assert-statement and magic-value-comparison rules for tests
+"test_*.py" = ["S101", "PLR2004"]
+# Disable unused-import rule for __init__.py files
+"__init__*.py" = ["F401",]
