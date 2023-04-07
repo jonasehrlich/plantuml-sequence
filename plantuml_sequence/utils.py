@@ -1,6 +1,7 @@
 import collections.abc
 import contextlib
 import enum
+import io
 import os
 import pathlib
 import tempfile
@@ -44,7 +45,7 @@ except ImportError:  # pragma: no cover
             return name.lower()
 
 
-__all__ = ["StrEnum", "LineWriter", "cwd", "temp_cwd"]
+__all__ = ["StrEnum", "LineWriter", "cwd", "temp_cwd", "string_io"]
 
 
 StrPath: TypeAlias = os.PathLike | str
@@ -112,3 +113,13 @@ def temp_cwd() -> collections.abc.Generator[pathlib.Path, None, None]:
     """
     with tempfile.TemporaryDirectory() as temp_dir_name, cwd(temp_dir_name) as temp_dir:
         yield temp_dir
+
+
+@contextlib.contextmanager
+def string_io() -> collections.abc.Generator[io.StringIO, None, None]:
+    """Contextmanager that yields a :py:class:`StringIO` object and seeks to zero position on exit"""
+    file_like = io.StringIO()
+    try:
+        yield file_like
+    finally:
+        file_like.seek(0)
