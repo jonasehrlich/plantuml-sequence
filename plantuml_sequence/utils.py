@@ -6,18 +6,18 @@ import os
 import pathlib
 import tempfile
 import textwrap
-from typing import Self, TextIO, TypeAlias
+from typing import Any, Self, TextIO, TypeAlias
 
 try:
     from enum import StrEnum
 except ImportError:  # pragma: no cover
     # Backport of the StrEnum class from Python 3.11
-    class StrEnum(str, enum.Enum):
+    class StrEnum(str, enum.Enum):  # type: ignore [no-redef]
         """
         Enum where members are also (and must be) strings
         """
 
-        def __new__(cls, *values):
+        def __new__(cls, *values: Any) -> Self:
             "values must already be of type `str`"
             if len(values) > 3:  # noqa: PLR2004
                 raise TypeError("too many arguments for str(): %r" % (values,))
@@ -38,7 +38,9 @@ except ImportError:  # pragma: no cover
             member._value_ = value
             return member
 
-        def _generate_next_value_(name, start, count, last_values):
+        def _generate_next_value_(  # type: ignore [override]
+            name: str, start: int, count: int, last_values: list[Any]
+        ) -> Any:
             """
             Return the lower-cased version of the member name.
             """
@@ -125,7 +127,7 @@ def string_io() -> collections.abc.Generator[io.StringIO, None, None]:
         file_like.seek(0)
 
 
-def quote_string_if_required(value: str):
+def quote_string_if_required(value: str) -> str:
     """
     Quote a string if it is not purely alphanumeric
 

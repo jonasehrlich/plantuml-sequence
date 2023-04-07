@@ -47,17 +47,15 @@ class SequenceDiagram:
         self.declare_collections = functools.partial(self._declare_some_participant, shape="collections")
         self.declare_queue = functools.partial(self._declare_some_participant, shape="queue")
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """Enter the context and write the the startuml command to the file"""
         return self.startuml()
 
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc: BaseException | None, exc_tb: TracebackType | None
-    ) -> bool:
+    ) -> None:
         """Enter the context and write the the enduml command to the file"""
         self.enduml()
-        # Do not suppress any raised exceptions
-        return False
 
     def startuml(self) -> Self:
         """Write the @startuml command to the file"""
