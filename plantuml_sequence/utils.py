@@ -6,10 +6,15 @@ import os
 import pathlib
 import tempfile
 import textwrap
-from typing import Any, Self, TextIO, TypeAlias
+from typing import Any, TextIO, TypeAlias
 
 try:
-    from enum import StrEnum
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
+
+try:
+    from enum import StrEnum  # type: ignore [attr-defined]
 except ImportError:  # pragma: no cover
     # Backport of the StrEnum class from Python 3.11
     class StrEnum(str, enum.Enum):  # type: ignore [no-redef]

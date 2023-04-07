@@ -564,7 +564,7 @@ files = [
 name = "typing-extensions"
 version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -596,4 +596,4 @@ test = ["covdefaults (>=2.2.2)", "coverage (>=7.1)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10"
-content-hash = "cc36f402bc1c4d91221acb3ebd16ea934f42077353187cdcf2ed68c8d6542218"
+content-hash = "3f142edd46d8fb3b6e60685ed228ed96f9e859360a45eb644a7a687e528aef72"

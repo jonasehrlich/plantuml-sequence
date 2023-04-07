@@ -1,7 +1,12 @@
 import dataclasses
 import functools
 from types import TracebackType
-from typing import Literal, Self, TextIO, Type, TypeAlias, TypeVar
+from typing import Literal, TextIO, Type, TypeAlias, TypeVar
+
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 from . import utils
 
