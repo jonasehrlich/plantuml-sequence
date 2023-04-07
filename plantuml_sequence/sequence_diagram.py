@@ -101,7 +101,7 @@ class SequenceDiagram:
         """
         message_suffix = ""
         if message:
-            message_suffix = f": {message}"
+            message_suffix = f": {utils.escape_newlines(message)}"
         participant1 = participant_to_string(participant1)
         participant2 = participant_to_string(participant2)
         arrow_style = arrow_style or self._arrow_style

@@ -50,7 +50,7 @@ else:  # pragma: no cover
             return name.lower()
 
 
-__all__ = ["StrEnum", "LineWriter", "cwd", "temp_cwd", "string_io", "quote_string_if_required"]
+__all__ = ["StrEnum", "LineWriter", "cwd", "temp_cwd", "string_io", "quote_string_if_required", "escape_newlines"]
 
 
 StrPath: TypeAlias = os.PathLike | str

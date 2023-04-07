@@ -67,7 +67,8 @@ Foo -> Foo7: To queue
     assert content == expected_output
 
 
-def test_declaring_participant2() -> None:
+def test_declaring_participant_background_color_long_names() -> None:
+    """Test declaration of participants with background color and long names"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         bob = sequence.declare_actor("Bob", color="#red")
         alice = sequence.declare_participant("Alice")
@@ -89,3 +90,24 @@ Bob -> L: Log transaction
 @enduml
 """
     assert content == expected_output
+
+
+def test_message_to_self() -> None:
+    """Test sending of long messages from a participant to itself"""
+    msg = "This is a signal to self.\nIt also demonstrates\nmultiline \ntext"
+    expected_output0 = """\
+@startuml
+Alice -> Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\ntext
+@enduml
+"""
+    expected_output1 = """\
+@startuml
+Alice <- Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\ntext
+@enduml
+"""
+    for arrow_style, expected_output in (("->", expected_output0), ("<-", expected_output1)):
+        with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+            sequence.message("Alice", "Alice", message=msg, arrow_style=arrow_style)
+
+        content = file_like.read()
+        assert content == expected_output
