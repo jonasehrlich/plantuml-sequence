@@ -240,3 +240,36 @@ Bob <- Alice: Yet another authentication Response
 """
     content = file_like.read()
     assert content == expected_output
+
+
+def test_newpage():
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        sequence.empty_line()
+        sequence.message("Alice", "Bob", "message 1")
+        sequence.message("Alice", "Bob", "message 2").empty_line()
+        sequence.newpage().empty_line()
+        sequence.message("Alice", "Bob", "message 3")
+        sequence.message("Alice", "Bob", "message 4").empty_line()
+        sequence.newpage("A title for the\nlast page").empty_line()
+        sequence.message("Alice", "Bob", "message 5")
+        sequence.message("Alice", "Bob", "message 6")
+
+    expected_output = """\
+@startuml
+
+Alice -> Bob: message 1
+Alice -> Bob: message 2
+
+newpage
+
+Alice -> Bob: message 3
+Alice -> Bob: message 4
+
+newpage A title for the\\nlast page
+
+Alice -> Bob: message 5
+Alice -> Bob: message 6
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output

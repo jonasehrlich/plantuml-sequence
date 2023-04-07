@@ -195,9 +195,25 @@ class SequenceDiagram:
         Resume previously stopped auto numbering with an optional new increment
 
         :param increment: New increment to use, defaults to None
+        :type increment: int | None, optional
+        :return: Sequence diagram instance
+        :rtype: Self
         """
         inc = str(increment) if increment is not None else ""
         self._line_writer.writeline(f"autonumber resume {inc}")
+        return self
+
+    def newpage(self, title: str | None = None) -> Self:
+        """
+        Split the diagram into multiple pages
+
+        :param title: Description of the page, defaults to None
+        :type title: str | None, optional
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+        title = utils.escape_newlines(title) if title is not None else ""
+        self._line_writer.writeline(f"newpage {title}")
         return self
 
 
