@@ -254,6 +254,20 @@ class SequenceDiagram:
         self._line_writer.writeline(line)
         return self
 
+    def space(self, num_pixels: int | None = None) -> Self:
+        """
+        Indicate some spacing in the diagram
+
+        :param num_pixels: Number of pixels to use for the spacing, defaults to None
+        :type num_pixels: int | None, optional
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+
+        line = f"||{num_pixels}||" if num_pixels is not None else "|||"
+        self._line_writer.writeline(line)
+        return self
+
 
 def participant_to_string(participant: Participant | str | None) -> str:
     """

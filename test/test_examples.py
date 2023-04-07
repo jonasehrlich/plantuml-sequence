@@ -381,3 +381,37 @@ Bob --> Alice: Good Bye !
 """
     content = file_like.read()
     assert content == expected_output
+
+
+def test_space():
+    """Test notation of spacings"""
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        (
+            sequence.empty_line()
+            .message("Alice", "Bob", "message 1")
+            .message("Bob", "Alice", "ok", arrow_style="-->")
+            .space()
+            .message("Alice", "Bob", "message 2")
+            .message("Bob", "Alice", "ok", arrow_style="-->")
+            .space(45)
+            .message("Alice", "Bob", "message 3")
+            .message("Bob", "Alice", "ok", arrow_style="-->")
+            .empty_line()
+        )
+
+    expected_output = """\
+@startuml
+
+Alice -> Bob: message 1
+Bob --> Alice: ok
+|||
+Alice -> Bob: message 2
+Bob --> Alice: ok
+||45||
+Alice -> Bob: message 3
+Bob --> Alice: ok
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
