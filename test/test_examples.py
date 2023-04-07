@@ -111,3 +111,28 @@ Alice <- Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\n
 
         content = file_like.read()
         assert content == expected_output
+
+
+def test_arrow_style_contextmanager():
+    """Test the contextmanager to change the arrow style"""
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        for arrow_style in ("->x", "->", "->>", "-\\", "\\\\-", "//--", "->o", "o\\\\--", "<->", "<->o"):
+            with sequence.arrow_style(arrow_style):
+                sequence.message("Bob", "Alice")
+
+    expected_output = """\
+@startuml
+Bob ->x Alice
+Bob -> Alice
+Bob ->> Alice
+Bob -\\ Alice
+Bob \\\\- Alice
+Bob //-- Alice
+Bob ->o Alice
+Bob o\\\\-- Alice
+Bob <-> Alice
+Bob <->o Alice
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output

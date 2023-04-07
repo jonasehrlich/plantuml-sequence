@@ -1,3 +1,5 @@
+import collections.abc
+import contextlib
 import dataclasses
 import functools
 import sys
@@ -138,6 +140,27 @@ class SequenceDiagram:
         self._participants[participant.alias] = participant
         self._line_writer.writeline(str(participant))
         return participant
+
+    @contextlib.contextmanager
+    def arrow_style(self, arrow_style: str) -> collections.abc.Generator[Self, None, None]:
+        """
+        Contextmanager to temporarily change the arrow style used in the diagram.
+
+        The arrow style can be changed in several ways:
+
+        * add a final ``x`` to denote a lost message
+        * use ``\\`` or ``/`` instead of ``<`` or ``>`` to have only the bottom or top part of the arrow
+        * repeat the arrow head (for example, ``>>`` or ``//``) head to have a thin drawing
+        * use ``--`` instead of ``-`` to have a dotted arrow
+        * add a final ``o`` at arrow head
+        * use bidirectional arrow ``<->``
+        """
+        old_arrow_style = self._arrow_style
+        self._arrow_style = arrow_style
+        try:
+            yield self
+        finally:
+            self._arrow_style = old_arrow_style
 
 
 def participant_to_string(participant: Participant | str | None) -> str:
