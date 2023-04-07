@@ -1,8 +1,7 @@
-import collections.abc
 import dataclasses
 import functools
 from types import TracebackType
-from typing import Literal, ParamSpec, Self, TextIO, Type, TypeAlias, TypeVar
+from typing import Literal, Self, TextIO, Type, TypeAlias, TypeVar
 
 from . import utils
 
@@ -14,7 +13,6 @@ GroupType: TypeAlias = Literal["alt", "else", "opt", "loop", "par", "break", "cr
 
 
 T = TypeVar("T", bound=TextIO)
-P = ParamSpec
 
 
 @dataclasses.dataclass(frozen=True)
@@ -29,23 +27,8 @@ class Participant:
             object.__setattr__(self, "alias", "".join(filter(str.isalnum, self.title)))
 
     def __str__(self) -> str:
-        quoted_title = utils.quote_string_if_required(self.title)
+        quoted_title = utils.quote_string_if_required(utils.escape_newlines(self.title))
         return f"{self.shape} {quoted_title} as {self.alias} {self.color}"
-
-
-def _participant_shape_partialmethod(
-    generic_declare_method: collections.abc.Callable[..., Participant], shape: ParticipantShape
-) -> functools.partialmethod[Participant]:
-    """Create a :py:class:`functools.partialmethod` object with a fixed shape argument"""
-    new_method = functools.partialmethod(generic_declare_method, shape=shape)
-    if generic_declare_method.__doc__ is not None:
-        new_docstring = "\n".join(
-            line.replace("participant", shape)
-            for line in generic_declare_method.__doc__.split("\n")
-            if "shape" not in line
-        )
-        new_method.__doc__ = new_docstring
-    return new_method
 
 
 class SequenceDiagram:
@@ -53,6 +36,16 @@ class SequenceDiagram:
         self._line_writer = utils.LineWriter(file_like)
         self._participants: dict[str, Participant] = {}
         self._arrow_style = "->"
+
+        self.declare_participant = functools.partial(self._declare_some_participant, shape="participant")
+        self.declare_participant.__doc__ = "foobar test"
+        self.declare_actor = functools.partial(self._declare_some_participant, shape="actor")
+        self.declare_boundary = functools.partial(self._declare_some_participant, shape="boundary")
+        self.declare_control = functools.partial(self._declare_some_participant, shape="control")
+        self.declare_entity = functools.partial(self._declare_some_participant, shape="entity")
+        self.declare_database = functools.partial(self._declare_some_participant, shape="database")
+        self.declare_collections = functools.partial(self._declare_some_participant, shape="collections")
+        self.declare_queue = functools.partial(self._declare_some_participant, shape="queue")
 
     def __enter__(self):
         """Enter the context and write the the startuml command to the file"""
@@ -111,8 +104,8 @@ class SequenceDiagram:
         self._line_writer.writeline(f"{participant1} {arrow_style} {participant2}{message_suffix}")
         return self
 
-    def declare_participant(
-        self, title: str, shape: ParticipantShape = "participant", alias: str | None = None, color: str | None = None
+    def _declare_some_participant(
+        self, title: str, shape: ParticipantShape, alias: str | None = None, color: str | None = None
     ) -> Participant:
         """
         Declare a participant
@@ -121,14 +114,14 @@ class SequenceDiagram:
 
         :param title: Title of the participant
         :type title: str
-        :param shape: Shape of the participant, defaults to "participant"
-        :type shape: ParticipantShape, optional
-        :param alias: Alias for the participant to use, defaults to ""
+        :param shape: Shape of the participant
+        :type shape: ParticipantShape
+        :param alias: Alias for the participant to use, defaults to None
         :type alias: str, optional
-        :param color: _description_, defaults to ""
+        :param color: Color of the participant, defaults to None
         :type color: str, optional
-        :raises ValueError: _description_
-        :return: _description_
+        :raises ValueError: Raised if the participant exists already
+        :return: Instance of the participant
         :rtype: Participant
         """
         alias = alias or ""
@@ -141,14 +134,6 @@ class SequenceDiagram:
         self._participants[participant.alias] = participant
         self._line_writer.writeline(str(participant))
         return participant
-
-    declare_actor = _participant_shape_partialmethod(declare_participant, shape="actor")
-    declare_boundary = _participant_shape_partialmethod(declare_participant, shape="boundary")
-    declare_control = _participant_shape_partialmethod(declare_participant, shape="control")
-    declare_entity = _participant_shape_partialmethod(declare_participant, shape="entity")
-    declare_database = _participant_shape_partialmethod(declare_participant, shape="database")
-    declare_collections = _participant_shape_partialmethod(declare_participant, shape="collections")
-    declare_queue = _participant_shape_partialmethod(declare_participant, shape="queue")
 
 
 def participant_to_string(participant: Participant | str | None) -> str:
