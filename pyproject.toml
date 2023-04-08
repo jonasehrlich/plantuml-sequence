@@ -83,3 +83,6 @@ select = [
 "test_*.py" = ["S101", "PLR2004"]
 # Disable unused-import rule for __init__.py files
 "__init__*.py" = ["F401",]
+
+[tool.ruff.pylint]
+max-args = 8
