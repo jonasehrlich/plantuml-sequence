@@ -50,7 +50,7 @@ else:  # pragma: no cover
             return name.lower()
 
 
-__all__ = ["StrEnum", "LineWriter", "cwd", "temp_cwd", "string_io", "quote_string_if_required", "escape_newlines"]
+__all__ = ["StrEnum", "LineWriter", "cwd", "temp_cwd", "string_io", "maybe_quote", "escape_newlines"]
 
 
 StrPath: TypeAlias = os.PathLike | str
@@ -130,16 +130,16 @@ def string_io() -> collections.abc.Generator[io.StringIO, None, None]:
         file_like.seek(0)
 
 
-def quote_string_if_required(value: str) -> str:
+def maybe_quote(value: str) -> str:
     """
     Quote a string if it is not purely alphanumeric
 
     :param value: String to quote
     :type value: str
     :return: Quoted or unquoted string
-    :rtype: _type_
+    :rtype: str
     """
-    if value.isalnum():
+    if not value or value.isalnum():
         return value
     return f'"{value}"'
 

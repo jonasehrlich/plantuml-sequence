@@ -35,7 +35,7 @@ class Participant:
             object.__setattr__(self, "alias", "".join(filter(str.isalnum, self.title)))
 
     def __str__(self) -> str:
-        quoted_title = utils.quote_string_if_required(utils.escape_newlines(self.title))
+        quoted_title = utils.maybe_quote(utils.escape_newlines(self.title))
         alias_suffix = "" if self.title == self.alias else f" as {self.alias}"
         return f"{self.shape} {quoted_title}{alias_suffix} {self.color}"
 
@@ -295,4 +295,4 @@ def participant_to_string(participant: Participant | str | None) -> str:
         return ""
     if isinstance(participant, Participant):
         return participant.alias
-    return utils.quote_string_if_required(participant)
+    return utils.maybe_quote(participant)

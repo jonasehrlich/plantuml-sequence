@@ -92,6 +92,7 @@ def test_temp_cwd_contextmanager() -> None:
 
 def test_string_quoting() -> None:
     for value, quote_required in (
+        ("", False),
         ("hello", False),
         ("Hello World", True),
         ("Bob()", True),
@@ -99,7 +100,7 @@ def test_string_quoting() -> None:
         ("foo_bar", True),
         ("Foo-bar", True),
     ):
-        quoted = utils.quote_string_if_required(value)
+        quoted = utils.maybe_quote(value)
         if quote_required:
             assert quoted == f'"{value}"'
         else:
