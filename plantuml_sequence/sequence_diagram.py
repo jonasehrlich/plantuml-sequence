@@ -41,10 +41,11 @@ class Participant:
 
 
 class SequenceDiagram:
-    def __init__(self, file_like: TextIO) -> None:
+    def __init__(self, file_like: TextIO, teoz_rendering: bool = False) -> None:
         self._line_writer = utils.LineWriter(file_like)
         self._participants: dict[str, Participant] = {}
         self._arrow_style = "->"
+        self._teoz_rendering = teoz_rendering
 
         self.declare_participant = functools.partial(self._declare_some_participant, shape="participant")
         self.declare_participant.__doc__ = "foobar test"
@@ -58,7 +59,10 @@ class SequenceDiagram:
 
     def __enter__(self) -> Self:
         """Enter the context and write the the startuml command to the file"""
-        return self.startuml()
+        self.startuml()
+        if self._teoz_rendering:
+            self._line_writer.writeline("!pragma teoz true")
+        return self
 
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc: BaseException | None, exc_tb: TracebackType | None
@@ -141,6 +145,29 @@ class SequenceDiagram:
         self._participants[participant.alias] = participant
         self._line_writer.writeline(str(participant))
         return participant
+
+    @contextlib.contextmanager
+    def participants_box(
+        self, title: str | None = None, background_color: str | None = None
+    ) -> collections.abc.Generator[Self, None, None]:
+        """
+        Create a contextmanager which will create a box around some participants
+
+        :param title: Title of the box, defaults to None
+        :type title: str | None, optional
+        :param background_color: Background color of the box, defaults to None
+        :type background_color: str | None, optional
+        :yield: Sequence diagram instance
+        :rtype: Iterator[collections.abc.Generator[Self, None, None]]
+        """
+        title = f' "{title}"' if title else ""
+        background_color = " " + background_color if background_color else ""
+
+        self._line_writer.writeline(f"box{title}{background_color}")
+        try:
+            yield self
+        finally:
+            self._line_writer.writeline("end box")
 
     @contextlib.contextmanager
     def arrow_style(self, arrow_style: str) -> collections.abc.Generator[Self, None, None]:

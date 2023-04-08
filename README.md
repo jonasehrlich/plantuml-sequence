@@ -4,6 +4,10 @@ Create plantuml sequence charts from Python
 
 ## Features
 
+### General
+
+* [x] Use *teoz* renderer
+
 ### Participants
 
 * [x] Declaring participants
@@ -11,7 +15,7 @@ Create plantuml sequence charts from Python
 * [ ] Create participant with message
 * [x] Lifeline activation / deactivation
 * [ ] Lifeline auto-activate
-* [ ] Participants encompass (Box around participants)
+* [x] Participants encompass (Box around participants)
 * [ ] Remove foot boxes
 
 ### Messages
@@ -36,7 +40,7 @@ Create plantuml sequence charts from Python
 
 * [ ] Basic message grouping
 * [ ] `alt` / `else` groups
-* [ ] Divider
+* [x] Divider
 * [ ] Reference
 * [x] Delay
 * [x] Space

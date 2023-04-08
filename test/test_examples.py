@@ -356,7 +356,7 @@ deactivate A
     assert content == expected_output
 
 
-def test_delay():
+def test_delay() -> None:
     """Test notation of delays"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         sequence.blank_line().message("Alice", "Bob", "Authentication Request").delay()
@@ -383,7 +383,7 @@ Bob --> Alice: Good Bye !
     assert content == expected_output
 
 
-def test_space():
+def test_space() -> None:
     """Test notation of spacings"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         (
@@ -417,7 +417,7 @@ Bob --> Alice: ok
     assert content == expected_output
 
 
-def test_divider():
+def test_divider() -> None:
     """Test creation of dividers with and without message"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         (
@@ -455,6 +455,76 @@ Alice <-- Bob: Another authentication Response
 
 Alice -> Bob: Yet another authentication Request
 Alice <-- Bob: Yet another authentication Response
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_participants_encompass() -> None:
+    """Test creation of a participants encompass"""
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        sequence.blank_line()
+        with sequence.participants_box("Internal Service", "#LightBlue"):
+            bob = sequence.declare_participant("Bob")
+            alice = sequence.declare_participant("Alice")
+        other = sequence.declare_participant("Other")
+        sequence.blank_line().message(bob, alice, "hello").message(alice, other, "hello").blank_line()
+
+    expected_output = """\
+@startuml
+
+box "Internal Service" #LightBlue
+participant Bob
+participant Alice
+end box
+participant Other
+
+Bob -> Alice: hello
+Alice -> Other: hello
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_participants_encompass_nested():
+    with string_io() as file_like, SequenceDiagram(file_like, teoz_rendering=True) as sequence:
+        sequence.blank_line()
+        with sequence.participants_box("Internal Service", "#LightBlue"):
+            bob = sequence.declare_participant("Bob")
+            with sequence.participants_box("Subteam"):
+                alice = sequence.declare_participant("Alice")
+                john = sequence.declare_participant("John")
+            sequence.blank_line()
+        other = sequence.declare_participant("Other")
+        (
+            sequence.blank_line()
+            .message(bob, alice, "hello")
+            .message(alice, john, "hello")
+            .message(john, other, "Hello")
+            .blank_line()
+        )
+
+    expected_output = """\
+@startuml
+!pragma teoz true
+
+box "Internal Service" #LightBlue
+participant Bob
+box "Subteam"
+participant Alice
+participant John
+end box
+
+end box
+participant Other
+
+Bob -> Alice: hello
+Alice -> John: hello
+John -> Other: Hello
 
 @enduml
 """
