@@ -109,7 +109,7 @@ Alice <- Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\n
 """
     for arrow_style, expected_output in (("->", expected_output0), ("<-", expected_output1)):
         with string_io() as file_like, SequenceDiagram(file_like) as sequence:
-            sequence.message("Alice", "Alice", message=msg, arrow_style=arrow_style)
+            sequence.message("Alice", "Alice", msg=msg, arrow_style=arrow_style)
 
         content = file_like.read()
         assert content == expected_output
@@ -525,6 +525,54 @@ participant Other
 Bob -> Alice: hello
 Alice -> John: hello
 John -> Other: Hello
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_hide_unlinked() -> None:
+    """Test the `hide unlinked` option"""
+    with string_io() as file_like, SequenceDiagram(file_like, hide_unlinked=True) as sequence:
+        alice = sequence.declare_participant("Alice")
+        bob = sequence.declare_participant("Bob")
+        sequence.declare_participant("Carol")
+        sequence.blank_line()
+
+        sequence.message(alice, bob, "hello")
+    expected_output = """\
+@startuml
+hide unlinked
+participant Alice
+participant Bob
+participant Carol
+
+Alice -> Bob: hello
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_remove_footbox() -> None:
+    """Test the `hide footbox` option"""
+    with string_io() as file_like, SequenceDiagram(
+        file_like, title="Foot Box removed", hide_footboxes=True
+    ) as sequence:
+        (
+            sequence.blank_line()
+            .message("Alice", "Bob", "Authentication Request")
+            .message("Bob", "Alice", "Authentication Response", arrow_style="-->")
+            .blank_line()
+        )
+    expected_output = """\
+@startuml
+hide footbox
+title Foot Box removed
+
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
 
 @enduml
 """

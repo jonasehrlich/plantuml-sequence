@@ -41,11 +41,22 @@ class Participant:
 
 
 class SequenceDiagram:
-    def __init__(self, file_like: TextIO, teoz_rendering: bool = False) -> None:
+    def __init__(
+        self,
+        file_like: TextIO,
+        title: str | None = None,
+        hide_footboxes: bool = False,
+        hide_unlinked: bool = False,
+        teoz_rendering: bool = False,
+    ) -> None:
+
         self._line_writer = utils.LineWriter(file_like)
         self._participants: dict[str, Participant] = {}
         self._arrow_style = "->"
+        self._title = title
         self._teoz_rendering = teoz_rendering
+        self._hide_footboxes = hide_footboxes
+        self._hide_unlinked = hide_unlinked
 
         self.declare_participant = functools.partial(self._declare_some_participant, shape="participant")
         self.declare_participant.__doc__ = "foobar test"
@@ -62,6 +73,12 @@ class SequenceDiagram:
         self.startuml()
         if self._teoz_rendering:
             self._line_writer.writeline("!pragma teoz true")
+        if self._hide_footboxes:
+            self._line_writer.writeline("hide footbox")
+        if self._hide_unlinked:
+            self._line_writer.writeline("hide unlinked")
+        if self._title:
+            self._line_writer.writeline(f"title {self._title}")
         return self
 
     def __exit__(
@@ -89,7 +106,8 @@ class SequenceDiagram:
         self,
         participant1: Participant | str | None,
         participant2: Participant | str | None,
-        message: str | None = None,
+        msg: str | None = None,
+        *,
         arrow_style: str | None = None,
     ) -> Self:
         """
@@ -99,16 +117,16 @@ class SequenceDiagram:
         :type participant1: Participant | str | None
         :param participant2: Participant right of the arrow
         :type participant2: Participant | str | None
-        :param message: Message to send between `participant1` and `participant2`, defaults to None
-        :type message: str | None, optional
+        :param msg: Message to send between `participant1` and `participant2`, defaults to None
+        :type msg: str | None, optional
         :param arrow_style: Override the arrow style to use, could be used for colored arrows, defaults to None
         :type arrow_style: str | None, optional
         :return: Sequence diagram object for chaining
         :rtype: Self
         """
         message_suffix = ""
-        if message:
-            message_suffix = f": {utils.escape_newlines(message)}"
+        if msg:
+            message_suffix = f": {utils.escape_newlines(msg)}"
         participant1 = participant_to_string(participant1)
         participant2 = participant_to_string(participant2)
         arrow_style = arrow_style or self._arrow_style
