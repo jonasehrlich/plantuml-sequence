@@ -10,7 +10,7 @@ def test_basic_examples() -> None:
         (
             sequence.message("Alice", "Bob", "Authentication Request")
             .message("Bob", "Alice", "Authentication Response", arrow_style="-->")
-            .empty_line()
+            .blank_line()
             .message("Alice", "Bob", "Another authentication Request")
             .message("Alice", "Bob", "Another authentication Response", arrow_style="<--")
         )
@@ -75,7 +75,7 @@ def test_declaring_participant_background_color_long_names() -> None:
         bob = sequence.declare_actor("Bob", color="#red")
         alice = sequence.declare_participant("Alice")
         long_name = sequence.declare_participant("I have a really\nlong name", alias="L", color="#99FF99")
-        sequence.empty_line()
+        sequence.blank_line()
         sequence.message(alice, bob, "Authentication Request")
         sequence.message(bob, alice, "Authentication Response")
         sequence.message(bob, long_name, "Log transaction")
@@ -161,15 +161,15 @@ def test_message_sequence_numbering_increment() -> None:
         sequence.autonumber()
         sequence.message("Bob", "Alice", "Authentication Request")
         sequence.message("Bob", "Alice", "Authentication Response", arrow_style="<-")
-        sequence.empty_line()
+        sequence.blank_line()
         sequence.autonumber(start=15)
         sequence.message("Bob", "Alice", "Another authentication Request")
         sequence.message("Bob", "Alice", "Another authentication Response", arrow_style="<-")
-        sequence.empty_line()
+        sequence.blank_line()
         sequence.autonumber(start=40, increment=10)
         sequence.message("Bob", "Alice", "Yet another authentication Request")
         sequence.message("Bob", "Alice", "Yet another authentication Response", arrow_style="<-")
-        sequence.empty_line()
+        sequence.blank_line()
     expected_output = """\
 @startuml
 autonumber
@@ -201,17 +201,17 @@ def test_message_sequence_numbering_stop_resume() -> None:
             sequence.autonumber(10, 10)
             .message("Bob", "Alice", "Authentication Request")
             .message("Bob", "Alice", "Authentication Response", arrow_style="<-")
-            .empty_line()
+            .blank_line()
             .autonumber_stop()
             .message("Bob", "Alice", "dummy")
-            .empty_line()
+            .blank_line()
             .autonumber_resume()
             .message("Bob", "Alice", "Yet another authentication Request")
             .message("Bob", "Alice", "Yet another authentication Response", arrow_style="<-")
-            .empty_line()
+            .blank_line()
             .autonumber_stop()
             .message("Bob", "Alice", "dummy")
-            .empty_line()
+            .blank_line()
             .autonumber_resume(increment=1)
             .message("Bob", "Alice", "Yet another authentication Request")
             .message("Bob", "Alice", "Yet another authentication Response", arrow_style="<-")
@@ -244,13 +244,13 @@ Bob <- Alice: Yet another authentication Response
 
 def test_newpage():
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
-        sequence.empty_line()
+        sequence.blank_line()
         sequence.message("Alice", "Bob", "message 1")
-        sequence.message("Alice", "Bob", "message 2").empty_line()
-        sequence.newpage().empty_line()
+        sequence.message("Alice", "Bob", "message 2").blank_line()
+        sequence.newpage().blank_line()
         sequence.message("Alice", "Bob", "message 3")
-        sequence.message("Alice", "Bob", "message 4").empty_line()
-        sequence.newpage("A title for the\nlast page").empty_line()
+        sequence.message("Alice", "Bob", "message 4").blank_line()
+        sequence.newpage("A title for the\nlast page").blank_line()
         sequence.message("Alice", "Bob", "message 5")
         sequence.message("Alice", "Bob", "message 6")
 
@@ -279,16 +279,16 @@ def test_activate_lifeline() -> None:
     """Test lifeline activation and deactivation"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         user = sequence.declare_participant("User")
-        sequence.empty_line().message(user, "A", "DoWork")
+        sequence.blank_line().message(user, "A", "DoWork")
         with sequence.activate_lifeline("A"):
-            sequence.empty_line().message("A", "B", "<< createRequest >>")
+            sequence.blank_line().message("A", "B", "<< createRequest >>")
             with sequence.activate_lifeline("B"):
-                sequence.empty_line().message("B", "C", "DoWork")
+                sequence.blank_line().message("B", "C", "DoWork")
                 with sequence.activate_lifeline("C", destroy=True), sequence.arrow_style("-->"):
                     sequence.message("C", "B", "WorkDone")
-                sequence.empty_line().message("B", "A", "RequestCreated", arrow_style="-->")
-            sequence.empty_line().message("A", user, "Done")
-        sequence.empty_line()
+                sequence.blank_line().message("B", "A", "RequestCreated", arrow_style="-->")
+            sequence.blank_line().message("A", user, "Done")
+        sequence.blank_line()
 
     expected_output = """\
 @startuml
@@ -321,15 +321,15 @@ def test_activate_lifeline_with_colors() -> None:
     """Test lifeline activation with colors"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         user = sequence.declare_participant("User")
-        sequence.empty_line().message(user, "A", "DoWork")
+        sequence.blank_line().message(user, "A", "DoWork")
         with sequence.activate_lifeline("A", color="#FFBBBB"):
-            sequence.empty_line().message("A", "A", "Internal call")
+            sequence.blank_line().message("A", "A", "Internal call")
             with sequence.activate_lifeline("A", color="#DarkSalmon"):
-                sequence.empty_line().message("A", "B", "<< createRequest >>")
+                sequence.blank_line().message("A", "B", "<< createRequest >>")
                 with sequence.activate_lifeline("B"), sequence.arrow_style("-->"):
-                    sequence.empty_line().message("B", "A", "RequestCreated")
+                    sequence.blank_line().message("B", "A", "RequestCreated")
             sequence.message("A", user, "Done")
-        sequence.empty_line()
+        sequence.blank_line()
 
     expected_output = """\
 @startuml
@@ -359,13 +359,13 @@ deactivate A
 def test_delay():
     """Test notation of delays"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
-        sequence.empty_line().message("Alice", "Bob", "Authentication Request").delay()
+        sequence.blank_line().message("Alice", "Bob", "Authentication Request").delay()
         with sequence.arrow_style("-->"):
             (
                 sequence.message("Bob", "Alice", "Authentication Response")
                 .delay("5 minutes later")
                 .message("Bob", "Alice", "Good Bye !")
-                .empty_line()
+                .blank_line()
             )
 
     expected_output = """\
@@ -387,7 +387,7 @@ def test_space():
     """Test notation of spacings"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         (
-            sequence.empty_line()
+            sequence.blank_line()
             .message("Alice", "Bob", "message 1")
             .message("Bob", "Alice", "ok", arrow_style="-->")
             .space()
@@ -396,7 +396,7 @@ def test_space():
             .space(45)
             .message("Alice", "Bob", "message 3")
             .message("Bob", "Alice", "ok", arrow_style="-->")
-            .empty_line()
+            .blank_line()
         )
 
     expected_output = """\
@@ -421,22 +421,22 @@ def test_divider():
     """Test creation of dividers with and without message"""
     with string_io() as file_like, SequenceDiagram(file_like) as sequence:
         (
-            sequence.empty_line()
+            sequence.blank_line()
             .divider("Initialization")
-            .empty_line()
+            .blank_line()
             .message("Alice", "Bob", "Authentication Request")
             .message("Bob", "Alice", "Authentication Response", arrow_style="-->")
-            .empty_line()
+            .blank_line()
             .divider("Repetition")
-            .empty_line()
+            .blank_line()
             .message("Alice", "Bob", "Another authentication Request")
             .message("Alice", "Bob", "Another authentication Response", arrow_style="<--")
-            .empty_line()
+            .blank_line()
             .divider()
-            .empty_line()
+            .blank_line()
             .message("Alice", "Bob", "Yet another authentication Request")
             .message("Alice", "Bob", "Yet another authentication Response", arrow_style="<--")
-            .empty_line()
+            .blank_line()
         )
     expected_output = """\
 @startuml

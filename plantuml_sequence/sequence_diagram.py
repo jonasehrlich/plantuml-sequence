@@ -76,7 +76,7 @@ class SequenceDiagram:
         self._line_writer.writeline("@enduml")
         return self
 
-    def empty_line(self) -> Self:
+    def blank_line(self) -> Self:
         """Write an empty line to the file"""
         self._line_writer.writeline("")
         return self
