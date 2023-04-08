@@ -415,3 +415,48 @@ Bob --> Alice: ok
 """
     content = file_like.read()
     assert content == expected_output
+
+
+def test_divider():
+    """Test creation of dividers with and without message"""
+    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        (
+            sequence.empty_line()
+            .divider("Initialization")
+            .empty_line()
+            .message("Alice", "Bob", "Authentication Request")
+            .message("Bob", "Alice", "Authentication Response", arrow_style="-->")
+            .empty_line()
+            .divider("Repetition")
+            .empty_line()
+            .message("Alice", "Bob", "Another authentication Request")
+            .message("Alice", "Bob", "Another authentication Response", arrow_style="<--")
+            .empty_line()
+            .divider()
+            .empty_line()
+            .message("Alice", "Bob", "Yet another authentication Request")
+            .message("Alice", "Bob", "Yet another authentication Response", arrow_style="<--")
+            .empty_line()
+        )
+    expected_output = """\
+@startuml
+
+== Initialization ==
+
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+== Repetition ==
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: Another authentication Response
+
+====
+
+Alice -> Bob: Yet another authentication Request
+Alice <-- Bob: Yet another authentication Response
+
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output

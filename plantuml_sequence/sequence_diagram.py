@@ -91,9 +91,9 @@ class SequenceDiagram:
         """
         Create a message between `participant1` and `participant2`
 
-        :param participant1: Key or :py:class:`Participant`
+        :param participant1: Participant left of the arrow
         :type participant1: Participant | str | None
-        :param participant2: Key or :py:class:`Participant`
+        :param participant2: Participant right of the arrow
         :type participant2: Participant | str | None
         :param message: Message to send between `participant1` and `participant2`, defaults to None
         :type message: str | None, optional
@@ -266,6 +266,19 @@ class SequenceDiagram:
 
         line = f"||{num_pixels}||" if num_pixels is not None else "|||"
         self._line_writer.writeline(line)
+        return self
+
+    def divider(self, msg: str | None = None) -> Self:
+        """
+        Insert a divider or separator to divide the diagram into logical steps
+
+        :param msg: Add a message to the separator
+        :type msg: str | None
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+        msg = f" {msg} " if msg else ""
+        self._line_writer.writeline(f"=={msg}==")
         return self
 
 
