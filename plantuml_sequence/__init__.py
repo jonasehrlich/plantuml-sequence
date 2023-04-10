@@ -1,1 +1,1 @@
-from .sequence_diagram import SequenceDiagram
+from .diagram import Diagram

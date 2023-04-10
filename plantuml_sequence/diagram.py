@@ -13,7 +13,7 @@ else:
 
 from . import utils
 
-__all__ = ["Participant", "SequenceDiagram"]
+__all__ = ["Participant", "Diagram"]
 
 ParticipantShape: TypeAlias = Literal[
     "participant", "actor", "boundary", "control", "entity", "database", "collections", "queue"
@@ -27,6 +27,8 @@ T = TypeVar("T", bound=TextIO)
 
 @dataclasses.dataclass(frozen=True)
 class Participant:
+    """Instance of a participant in the diagram"""
+
     title: str
     shape: ParticipantShape
     alias: str = ""
@@ -42,7 +44,19 @@ class Participant:
         return f"{self.shape} {quoted_title}{alias_suffix} {self.color}"
 
 
-class SequenceDiagram:
+class Diagram:
+    """
+    Core sequence diagram object
+
+    Create the object and use it as a contextmanager.
+
+    .. code-block:: python
+
+       with open("my-diagram.puml", "w") as f, SequenceDiagram(f) as diagram:
+          diagram.message("Alice", "Bob", "Hello World!")
+
+    """
+
     def __init__(
         self,
         file_like: TextIO,
@@ -51,6 +65,20 @@ class SequenceDiagram:
         hide_unlinked: bool = False,
         teoz_rendering: bool = False,
     ) -> None:
+        """
+        Initialize the sequence diagram object
+
+        :param file_like: File-like object to write the diagram to
+        :type file_like: TextIO
+        :param title: Title of the diagram, defaults to None
+        :type title: str | None, optional
+        :param hide_footboxes: Whether to hide the participant footboxes in the sequence diagram, defaults to False
+        :type hide_footboxes: bool, optional
+        :param hide_unlinked: Whether to hide unlinked participants, defaults to False
+        :type hide_unlinked: bool, optional
+        :param teoz_rendering: Whether to use the *teoz* rendering engine, defaults to False
+        :type teoz_rendering: bool, optional
+        """
 
         self._line_writer = utils.LineWriter(file_like)
         self._participants: dict[str, Participant] = {}
@@ -61,7 +89,6 @@ class SequenceDiagram:
         self._hide_unlinked = hide_unlinked
 
         self.declare_participant = functools.partial(self._declare_some_participant, shape="participant")
-        self.declare_participant.__doc__ = "foobar test"
         self.declare_actor = functools.partial(self._declare_some_participant, shape="actor")
         self.declare_boundary = functools.partial(self._declare_some_participant, shape="boundary")
         self.declare_control = functools.partial(self._declare_some_participant, shape="control")
@@ -90,17 +117,17 @@ class SequenceDiagram:
         self.enduml()
 
     def startuml(self) -> Self:
-        """Write the @startuml command to the file"""
+        """Write the `@startuml` command to the file"""
         self._line_writer.writeline("@startuml")
         return self
 
     def enduml(self) -> Self:
-        """Write the @enduml command to the file"""
+        """Write the `@enduml` command to the file"""
         self._line_writer.writeline("@enduml")
         return self
 
     def blank_line(self) -> Self:
-        """Write an empty line to the file"""
+        """Write a blank line to the file"""
         self._line_writer.writeline("")
         return self
 

@@ -8,9 +8,9 @@ The basic example of the [PlantUML Documentation](https://plantuml.com/sequence-
 following Python script:
 
 ``` python
-from plantuml_sequence import SequenceDiagram
+from plantuml_sequence import Diagram
 
-with open("my-diagram.puml", "w") as file, SequenceDiagram(file) as sequence:
+with open("my-diagram.puml", "w") as file, Diagram(file) as sequence:
     (
         sequence.message("Alice", "Bob", "Authentication Request")
         .message("Bob", "Alice", "Authentication Response", arrow_style="-->")

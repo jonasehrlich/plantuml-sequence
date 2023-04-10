@@ -1,12 +1,12 @@
 import pytest
 
-from plantuml_sequence import SequenceDiagram
+from plantuml_sequence import Diagram
 from plantuml_sequence.utils import string_io
 
 
 def test_basic_examples() -> None:
     """Test creation of a simple message"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         (
             sequence.message("Alice", "Bob", "Authentication Request")
             .message("Bob", "Alice", "Authentication Response", arrow_style="-->")
@@ -31,7 +31,7 @@ Alice <-- Bob: Another authentication Response
 
 
 def test_declaring_participant() -> None:
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         participants = [
             sequence.declare_participant("Participant", alias="Foo"),
             sequence.declare_actor("Actor", alias="Foo1"),
@@ -71,7 +71,7 @@ Foo -> Foo7: To queue
 
 def test_declaring_participant_background_color_long_names() -> None:
     """Test declaration of participants with background color and long names"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         bob = sequence.declare_actor("Bob", color="#red")
         alice = sequence.declare_participant("Alice")
         long_name = sequence.declare_participant("I have a really\nlong name", alias="L", color="#99FF99")
@@ -108,7 +108,7 @@ Alice <- Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\n
 @enduml
 """
     for arrow_style, expected_output in (("->", expected_output0), ("<-", expected_output1)):
-        with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+        with string_io() as file_like, Diagram(file_like) as sequence:
             sequence.message("Alice", "Alice", msg=msg, arrow_style=arrow_style)
 
         content = file_like.read()
@@ -117,7 +117,7 @@ Alice <- Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\n
 
 def test_arrow_style_contextmanager() -> None:
     """Test the contextmanager to change the arrow style"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         for arrow_style in ("->x", "->", "->>", "-\\", "\\\\-", "//--", "->o", "o\\\\--", "<->", "<->o"):
             with sequence.arrow_style(arrow_style):
                 sequence.message("Bob", "Alice")
@@ -141,7 +141,7 @@ Bob <->o Alice
 
 
 def test_message_sequence_numbering_basic() -> None:
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         sequence.autonumber()
         sequence.message("Bob", "Alice", "Authentication Request")
         sequence.message("Bob", "Alice", "Authentication Response", arrow_style="<-")
@@ -157,7 +157,7 @@ Bob <- Alice: Authentication Response
 
 
 def test_message_sequence_numbering_increment() -> None:
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         sequence.autonumber()
         sequence.message("Bob", "Alice", "Authentication Request")
         sequence.message("Bob", "Alice", "Authentication Response", arrow_style="<-")
@@ -191,12 +191,12 @@ Bob <- Alice: Yet another authentication Response
 
 
 def test_message_sequence_numbering_increment_no_start_value() -> None:
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence, pytest.raises(ValueError):
+    with string_io() as file_like, Diagram(file_like) as sequence, pytest.raises(ValueError):
         sequence.autonumber(increment=1)
 
 
 def test_message_sequence_numbering_stop_resume() -> None:
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         (
             sequence.autonumber(10, 10)
             .message("Bob", "Alice", "Authentication Request")
@@ -243,7 +243,7 @@ Bob <- Alice: Yet another authentication Response
 
 
 def test_newpage():
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         sequence.blank_line()
         sequence.message("Alice", "Bob", "message 1")
         sequence.message("Alice", "Bob", "message 2").blank_line()
@@ -277,7 +277,7 @@ Alice -> Bob: message 6
 
 def test_activate_lifeline() -> None:
     """Test lifeline activation and deactivation"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         user = sequence.declare_participant("User")
         sequence.blank_line().message(user, "A", "DoWork")
         with sequence.activate_lifeline("A"):
@@ -319,7 +319,7 @@ deactivate A
 
 def test_activate_lifeline_with_colors() -> None:
     """Test lifeline activation with colors"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         user = sequence.declare_participant("User")
         sequence.blank_line().message(user, "A", "DoWork")
         with sequence.activate_lifeline("A", color="#FFBBBB"):
@@ -358,7 +358,7 @@ deactivate A
 
 def test_delay() -> None:
     """Test notation of delays"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         sequence.blank_line().message("Alice", "Bob", "Authentication Request").delay()
         with sequence.arrow_style("-->"):
             (
@@ -385,7 +385,7 @@ Bob --> Alice: Good Bye !
 
 def test_space() -> None:
     """Test notation of spacings"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         (
             sequence.blank_line()
             .message("Alice", "Bob", "message 1")
@@ -419,7 +419,7 @@ Bob --> Alice: ok
 
 def test_divider() -> None:
     """Test creation of dividers with and without message"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         (
             sequence.blank_line()
             .divider("Initialization")
@@ -464,7 +464,7 @@ Alice <-- Bob: Yet another authentication Response
 
 def test_participants_encompass() -> None:
     """Test creation of a participants encompass"""
-    with string_io() as file_like, SequenceDiagram(file_like) as sequence:
+    with string_io() as file_like, Diagram(file_like) as sequence:
         sequence.blank_line()
         with sequence.participants_box("Internal Service", "#LightBlue"):
             bob = sequence.declare_participant("Bob")
@@ -491,7 +491,7 @@ Alice -> Other: hello
 
 
 def test_participants_encompass_nested():
-    with string_io() as file_like, SequenceDiagram(file_like, teoz_rendering=True) as sequence:
+    with string_io() as file_like, Diagram(file_like, teoz_rendering=True) as sequence:
         sequence.blank_line()
         with sequence.participants_box("Internal Service", "#LightBlue"):
             bob = sequence.declare_participant("Bob")
@@ -534,7 +534,7 @@ John -> Other: Hello
 
 def test_hide_unlinked() -> None:
     """Test the `hide unlinked` option"""
-    with string_io() as file_like, SequenceDiagram(file_like, hide_unlinked=True) as sequence:
+    with string_io() as file_like, Diagram(file_like, hide_unlinked=True) as sequence:
         alice = sequence.declare_participant("Alice")
         bob = sequence.declare_participant("Bob")
         sequence.declare_participant("Carol")
@@ -557,9 +557,7 @@ Alice -> Bob: hello
 
 def test_remove_footbox() -> None:
     """Test the `hide footbox` option"""
-    with string_io() as file_like, SequenceDiagram(
-        file_like, title="Foot Box removed", hide_footboxes=True
-    ) as sequence:
+    with string_io() as file_like, Diagram(file_like, title="Foot Box removed", hide_footboxes=True) as sequence:
         (
             sequence.blank_line()
             .message("Alice", "Bob", "Authentication Request")

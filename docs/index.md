@@ -7,7 +7,7 @@ Create PlantUML sequence charts programmatically from Python
 :maxdepth: 3
 
 examples
-apidocs/index
+apidoc
 ```
 
 ## Usage

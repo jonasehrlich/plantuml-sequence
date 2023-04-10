@@ -17,7 +17,6 @@ release = "0.1.0"
 extensions = [
     "sphinx.ext.autodoc",
     "myst_parser",
-    "autodoc2",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -38,14 +37,3 @@ html_theme = "furo"
 html_static_path = ["_static"]
 
 # -- Options for myst-parser -------------------------------------------------
-
-# -- Options for autodoc2 extension ------------------------------------------
-autodoc2_packages = [
-    "../plantuml_sequence",
-]
-autodoc2_render_plugin = "myst"
-# autodoc2_module_all_regexes = [
-#     r"plantuml_sequence\..*",
-# ]
-autodoc2_module_summary = False
-autodoc2_hidden_objects = ["dunder", "private", "inherited"]
