@@ -1,8 +1,41 @@
 # plantuml-sequence
 
-Create plantuml sequence charts from Python
+Create PlantUML sequence charts programmatically from Python
+
+## Usage
+
+The basic example of the [PlantUML Documentation](https://plantuml.com/sequence-diagram) can be implemented with the
+following Python script:
+
+``` python
+from plantuml_sequence import SequenceDiagram
+
+with open("my-diagram.puml", "w") as file, SequenceDiagram(file) as sequence:
+    (
+        sequence.message("Alice", "Bob", "Authentication Request")
+        .message("Bob", "Alice", "Authentication Response", arrow_style="-->")
+        .blank_line()
+        .message("Alice", "Bob", "Another authentication Request")
+        .message("Alice", "Bob", "Another authentication Response", arrow_style="<--")
+    )
+
+```
+
+Its output inside *my-diagram.puml* is:
+
+``` puml
+@startuml
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: Another authentication Response
+@enduml
+```
 
 ## Features
+
+Not all of the features of message sequence charts are supported yet. See the list of implemented features below.
 
 ### General
 
@@ -16,7 +49,7 @@ Create plantuml sequence charts from Python
 * [x] Lifeline activation / deactivation
 * [ ] Lifeline auto-activate
 * [x] Participants encompass (Box around participants)
-* [ ] Remove foot boxes
+* [x] Remove foot boxes
 
 ### Messages
 
