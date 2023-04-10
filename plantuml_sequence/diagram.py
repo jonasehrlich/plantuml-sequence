@@ -358,7 +358,7 @@ class Diagram:
         :rtype: Self
         """
         alias = participant_to_string(participant)
-        self._line_writer.writeline(f"deactivate {alias}")
+        self._line_writer.writeline(f"destroy {alias}")
         return self
 
     def delay(self, msg: str | None = None) -> Self:
