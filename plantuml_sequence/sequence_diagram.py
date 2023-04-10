@@ -13,6 +13,8 @@ else:
 
 from . import utils
 
+__all__ = ["Participant", "SequenceDiagram"]
+
 ParticipantShape: TypeAlias = Literal[
     "participant", "actor", "boundary", "control", "entity", "database", "collections", "queue"
 ]
@@ -69,7 +71,7 @@ class SequenceDiagram:
         self.declare_queue = functools.partial(self._declare_some_participant, shape="queue")
 
     def __enter__(self) -> Self:
-        """Enter the context and write the the startuml command to the file"""
+        """Enter the context and write the the *startuml* command to the file"""
         self.startuml()
         if self._teoz_rendering:
             self._line_writer.writeline("!pragma teoz true")
@@ -84,7 +86,7 @@ class SequenceDiagram:
     def __exit__(
         self, exc_type: Type[BaseException] | None, exc: BaseException | None, exc_tb: TracebackType | None
     ) -> None:
-        """Enter the context and write the the enduml command to the file"""
+        """Enter the context and write the the *enduml* command to the file"""
         self.enduml()
 
     def startuml(self) -> Self:
@@ -111,7 +113,7 @@ class SequenceDiagram:
         arrow_style: str | None = None,
     ) -> Self:
         """
-        Create a message between `participant1` and `participant2`
+        Create a message between *participant1* and *participant2*
 
         :param participant1: Participant left of the arrow
         :type participant1: Participant | str | None
