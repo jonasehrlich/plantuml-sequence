@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plantuml-sequence"
-version = "0.1.1"
+version = "0.2.0"
 description = "Create PlantUML sequence charts programmatically from Python"
 authors = ["Jonas Ehrlich <jonas.ehrlich@gmail.com>"]
 readme = "README.md"
