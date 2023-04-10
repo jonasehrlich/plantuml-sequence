@@ -292,7 +292,7 @@ class Diagram:
         return self
 
     @contextlib.contextmanager
-    def activate_lifeline(
+    def active_lifeline(
         self, participant: Participant | str, color: str = "", destroy: bool = False
     ) -> collections.abc.Generator[Self, None, None]:
         """
@@ -307,13 +307,59 @@ class Diagram:
         :yield: Sequence diagram instance
         :rtype: Iterator[collections.abc.Generator[Self, None, None]]
         """
-        alias = participant_to_string(participant)
-        self._line_writer.writeline(f"activate {alias} {color}")
+        self.activate_lifeline(participant, color)
         try:
             yield self
         finally:
-            action = "destroy" if destroy else "deactivate"
-            self._line_writer.writeline(f"{action} {alias}")
+            if destroy:
+                self.destroy_lifeline(participant)
+            else:
+                self.deactivate_lifeline(participant)
+
+    def activate_lifeline(self, participant: Participant | str, color: str = "") -> Self:
+        """
+        Activate the lifeline of `participant`
+
+        :param participant: Participant to activate
+        :type participant: Participant | str
+        :param color: Color of the active lifeline, defaults to ""
+        :type color: str, optional
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+        alias = participant_to_string(participant)
+        self._line_writer.writeline(f"activate {alias} {color}")
+        return self
+
+    def deactivate_lifeline(self, participant: Participant | str) -> Self:
+        """
+        Deactivate the lifeline of `participant`
+
+        :param participant: Participant to activate
+        :type participant: Participant | str
+        :param color: Color of the active lifeline, defaults to ""
+        :type color: str, optional
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+        alias = participant_to_string(participant)
+        self._line_writer.writeline(f"deactivate {alias}")
+        return self
+
+    def destroy_lifeline(self, participant: Participant | str) -> Self:
+        """
+        Deactivate the lifeline of `participant`
+
+        :param participant: Participant to activate
+        :type participant: Participant | str
+        :param color: Color of the active lifeline, defaults to ""
+        :type color: str, optional
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+        alias = participant_to_string(participant)
+        self._line_writer.writeline(f"deactivate {alias}")
+        return self
 
     def delay(self, msg: str | None = None) -> Self:
         """

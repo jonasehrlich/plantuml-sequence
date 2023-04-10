@@ -280,11 +280,11 @@ def test_activate_lifeline() -> None:
     with string_io() as file_like, Diagram(file_like) as sequence:
         user = sequence.declare_participant("User")
         sequence.blank_line().message(user, "A", "DoWork")
-        with sequence.activate_lifeline("A"):
+        with sequence.active_lifeline("A"):
             sequence.blank_line().message("A", "B", "<< createRequest >>")
-            with sequence.activate_lifeline("B"):
+            with sequence.active_lifeline("B"):
                 sequence.blank_line().message("B", "C", "DoWork")
-                with sequence.activate_lifeline("C", destroy=True), sequence.arrow_style("-->"):
+                with sequence.active_lifeline("C", destroy=True), sequence.arrow_style("-->"):
                     sequence.message("C", "B", "WorkDone")
                 sequence.blank_line().message("B", "A", "RequestCreated", arrow_style="-->")
             sequence.blank_line().message("A", user, "Done")
@@ -322,11 +322,11 @@ def test_activate_lifeline_with_colors() -> None:
     with string_io() as file_like, Diagram(file_like) as sequence:
         user = sequence.declare_participant("User")
         sequence.blank_line().message(user, "A", "DoWork")
-        with sequence.activate_lifeline("A", color="#FFBBBB"):
+        with sequence.active_lifeline("A", color="#FFBBBB"):
             sequence.blank_line().message("A", "A", "Internal call")
-            with sequence.activate_lifeline("A", color="#DarkSalmon"):
+            with sequence.active_lifeline("A", color="#DarkSalmon"):
                 sequence.blank_line().message("A", "B", "<< createRequest >>")
-                with sequence.activate_lifeline("B"), sequence.arrow_style("-->"):
+                with sequence.active_lifeline("B"), sequence.arrow_style("-->"):
                     sequence.blank_line().message("B", "A", "RequestCreated")
             sequence.message("A", user, "Done")
         sequence.blank_line()
