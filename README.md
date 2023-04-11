@@ -2,14 +2,6 @@
 
 Create PlantUML sequence charts programmatically from Python
 
-## Installation
-
-```sh
-pip install plantuml-sequence
-```
-
-## Usage
-
 The basic example of the [PlantUML Documentation](https://plantuml.com/sequence-diagram) can be implemented with the
 following Python script:
 
@@ -39,7 +31,23 @@ Alice <-- Bob: Another authentication Response
 @enduml
 ```
 
-## Features
+This can be compiled to an image using the `plantuml` command.
+
+---
+
+**[Read the documentation on ReadTheDocs!](https://plantuml-sequence.readthedocs.io/)**
+
+---
+
+## Installation and supported Python versions
+
+```sh
+pip install plantuml-sequence
+```
+
+Python 3.10+ is supported
+
+## Supported PlantUML features
 
 Not all of the features of message sequence charts are supported yet. See the list of implemented features below.
 

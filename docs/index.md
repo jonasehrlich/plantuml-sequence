@@ -3,13 +3,6 @@
 
 Create PlantUML sequence charts programmatically from Python
 
-```{toctree}
-:maxdepth: 3
-
-examples
-apidoc
-```
-
 ## Usage
 
 The basic example of the [PlantUML Documentation](https://plantuml.com/sequence-diagram) can be implemented with the
@@ -43,8 +36,14 @@ Alice <-- Bob: Another authentication Response
 
 For more examples covering different functionality see [examples](#examples).
 
+```{toctree}
+:maxdepth: 3
+
+examples
+apidoc
+```
+
 ## Indices and tables
 
 * [Index](genindex)
-* [Modules](modindex)
 * [Search](search)

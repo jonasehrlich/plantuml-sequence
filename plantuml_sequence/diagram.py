@@ -434,7 +434,7 @@ class Diagram:
         Place a note relative to a participant
 
         .. warning::
-           Notes can only placed `over` multiple participants, if
+           Notes can only placed `over` multiple participants. Otherwise an exception will be raised.
 
         :param participants: Participant or sequence of participant definitions
         :type participants: collections.abc.Sequence[ParticipantOrName] | ParticipantOrName
