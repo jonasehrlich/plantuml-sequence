@@ -2,6 +2,12 @@
 
 Create PlantUML sequence charts programmatically from Python
 
+## Installation
+
+```sh
+pip install plantuml-sequence
+```
+
 ## Usage
 
 The basic example of the [PlantUML Documentation](https://plantuml.com/sequence-diagram) can be implemented with the
@@ -58,15 +64,15 @@ Not all of the features of message sequence charts are supported yet. See the li
 * [ ] Advanced auto numbering
   * [ ] `autonumber` formats
   * [ ] `autonumber` sequence increments
-* [ ] Hide unlinked participants
+* [x] Hide unlinked participants
 * [ ] Mainframe
 
 ### Notes
 
-* [ ] Different note shapes (`note`, `hnote`, `rnote`)
-* [ ] Notes on messages
-* [ ] Notes over / left / right of lifelines
-* [ ] Notes across all participants
+* [x] Different note shapes (`note`, `hnote`, `rnote`)
+* [x] Notes on messages
+* [x] Notes over / left / right of lifelines
+* [x] Notes across all participants
 * [ ] Multiple notes at the same level
 
 ### Flow
