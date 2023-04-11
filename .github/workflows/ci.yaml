@@ -1,34 +1,36 @@
-name: Python package
+name: test
 
 on: [push]
-
 jobs:
-  build:
-
+  test:
+    env:
+      POETRY_VERSION: "1.4.0"
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.10", "3.11"]
-
     steps:
       - uses: actions/checkout@v3
+      - name: Load cached Poetry installation
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: ${{ runner.os }}-dotlocal-dir-py${{matrix.python-version }}-poetry${{ env.POETRY_VERSION }}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: Gr1N/setup-poetry@v8
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Check poetry availability
-        run: poetry --version
+          cache: "poetry"
       - name: Install dependencies with poetry
         run: poetry install
       - name: Lint with ruff
         run: |
-          # stop the build if there are Python syntax errors or undefined names
+          # Stop the build if there are Python syntax errors or undefined names
           poetry run ruff --format=github --select=E9,F63,F7,F82 --target-version=py310 .
-          # default set of ruff rules with GitHub Annotations
+          # Default set of ruff rules with GitHub Annotations
           poetry run ruff --format=github --target-version=py310 .
       - name: Static type checking with mypy
         run: |
