@@ -7,7 +7,8 @@ readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/jonasehrlich/plantuml-sequence"
 repository = "https://github.com/jonasehrlich/plantuml-sequence"
-keywords = ["plantuml", "charts"]
+documentation = "https://plantuml-sequence.readthedocs.io"
+keywords = ["plantuml", "diagram"]
 
 [build-system]
 requires = ["poetry-core"]
