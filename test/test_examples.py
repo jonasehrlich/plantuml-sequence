@@ -4,7 +4,7 @@ from plantuml_sequence import Diagram
 from plantuml_sequence.utils import string_io
 
 
-def test_basic_examples() -> None:
+def test_basic_example() -> None:
     """Test creation of a simple message"""
     with string_io() as file_like, Diagram(file_like) as sequence:
         (

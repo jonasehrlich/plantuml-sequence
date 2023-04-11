@@ -31,7 +31,8 @@ Alice <-- Bob: Another authentication Response
 @enduml
 ```
 
-This can be compiled to an image using the `plantuml` command.
+This file be compiled to an image using the `plantuml` command-line or a online server. See the
+[PlantUML documentation](https://plantuml.com/starting) for more details.
 
 ---
 

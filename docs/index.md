@@ -3,8 +3,6 @@
 
 Create PlantUML sequence charts programmatically from Python
 
-## Usage
-
 The basic example of the [PlantUML Documentation](https://plantuml.com/sequence-diagram) can be implemented with the
 following Python script:
 
@@ -34,7 +32,14 @@ Alice <-- Bob: Another authentication Response
 @enduml
 ```
 
+:::{tip}
+This file be compiled to an image using the `plantuml` command-line or a online server. See the
+[PlantUML documentation](https://plantuml.com/starting) for more details.
+:::
+
 For more examples covering different functionality see [examples](#examples).
+
+## Contents
 
 ```{toctree}
 :maxdepth: 3

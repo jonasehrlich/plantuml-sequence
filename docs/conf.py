@@ -35,3 +35,7 @@ html_theme = "furo"
 html_static_path = ["_static"]
 
 # -- Options for myst-parser -------------------------------------------------
+
+myst_enable_extensions = [
+    "colon_fence",
+]
