@@ -72,9 +72,9 @@ Foo -> Foo7: To queue
 def test_declaring_participant_background_color_long_names() -> None:
     """Test declaration of participants with background color and long names"""
     with string_io() as file_like, Diagram(file_like) as sequence:
-        bob = sequence.declare_actor("Bob", color="#red")
+        bob = sequence.declare_actor("Bob", color="red")
         alice = sequence.declare_participant("Alice")
-        long_name = sequence.declare_participant("I have a really\nlong name", alias="L", color="#99FF99")
+        long_name = sequence.declare_participant("I have a really\nlong name", alias="L", color="99FF99")
         sequence.blank_line()
         sequence.message(alice, bob, "Authentication Request")
         sequence.message(bob, alice, "Authentication Response")
@@ -322,9 +322,9 @@ def test_activate_lifeline_with_colors() -> None:
     with string_io() as file_like, Diagram(file_like) as sequence:
         user = sequence.declare_participant("User")
         sequence.blank_line().message(user, "A", "DoWork")
-        with sequence.active_lifeline("A", color="#FFBBBB"):
+        with sequence.active_lifeline("A", color="FFBBBB"):
             sequence.blank_line().message("A", "A", "Internal call")
-            with sequence.active_lifeline("A", color="#DarkSalmon"):
+            with sequence.active_lifeline("A", color="DarkSalmon"):
                 sequence.blank_line().message("A", "B", "<< createRequest >>")
                 with sequence.active_lifeline("B"), sequence.arrow_style("-->"):
                     sequence.blank_line().message("B", "A", "RequestCreated")
@@ -466,7 +466,7 @@ def test_participants_encompass() -> None:
     """Test creation of a participants encompass"""
     with string_io() as file_like, Diagram(file_like) as sequence:
         sequence.blank_line()
-        with sequence.participants_box("Internal Service", "#LightBlue"):
+        with sequence.participants_box("Internal Service", "LightBlue"):
             bob = sequence.declare_participant("Bob")
             alice = sequence.declare_participant("Alice")
         other = sequence.declare_participant("Other")
@@ -493,7 +493,7 @@ Alice -> Other: hello
 def test_participants_encompass_nested():
     with string_io() as file_like, Diagram(file_like, teoz_rendering=True) as sequence:
         sequence.blank_line()
-        with sequence.participants_box("Internal Service", "#LightBlue"):
+        with sequence.participants_box("Internal Service", "LightBlue"):
             bob = sequence.declare_participant("Bob")
             with sequence.participants_box("Subteam"):
                 alice = sequence.declare_participant("Alice")
@@ -576,3 +576,122 @@ Bob --> Alice: Authentication Response
 """
     content = file_like.read()
     assert content == expected_output
+
+
+def test_some_other_notes() -> None:
+    """Test notes relative to participants, across all participants with and without colors"""
+    with string_io() as file_like, Diagram(
+        file_like,
+    ) as sequence:
+        alice = sequence.declare_participant("Alice")
+        bob = sequence.declare_participant("Bob")
+        sequence.participant_note(
+            alice, "This is displayed\nleft of Alice.", position="left", background_color="aqua"
+        ).blank_line()
+        sequence.participant_note(alice, "This is displayed right of Alice.", position="right").blank_line()
+        sequence.participant_note(alice, "This is displayed over Alice.").blank_line()
+        sequence.participant_note([alice, bob], "This is displayed\nover Bob and Alice.", background_color="FFAAAA")
+
+    expected_output = """\
+@startuml
+participant Alice
+participant Bob
+note left of Alice #aqua: This is displayed\\nleft of Alice.
+
+note right of Alice: This is displayed right of Alice.
+
+note over Alice: This is displayed over Alice.
+
+note over Alice, Bob #FFAAAA: This is displayed\\nover Bob and Alice.
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_note_multiple_participants_left_and_right_raises() -> None:
+    """Test that the creation of notes `left of` or `right of` multiple participants fails"""
+    for position in ("left", "right"):
+        with pytest.raises(ValueError), string_io() as file_like, Diagram(
+            file_like,
+        ) as sequence:
+            sequence.participant_note(["Alice", "Bob"], "This is displayed\nleft of Alice.", position=position)
+
+
+def test_notes_on_messages() -> None:
+    """Test notes relative to messages"""
+    alice = "Alice"
+    bob = "Bob"
+    with string_io() as file_like, Diagram(
+        file_like,
+    ) as sequence:
+        (
+            sequence.message(alice, bob, "hello", note="this is a first note", note_position="left")
+            .blank_line()
+            .message(bob, alice, "ok", note="this is another note")
+            .blank_line()
+            .message(
+                bob, bob, "I am thinking", note="a note\ncan also be defined\nusing line breaks", note_position="left"
+            )
+        )
+
+    expected_output = """\
+@startuml
+Alice -> Bob: hello
+note left: this is a first note
+
+Bob -> Alice: ok
+note right: this is another note
+
+Bob -> Bob: I am thinking
+note left: a note\\ncan also be defined\\nusing line breaks
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_notes_across_all_participants() -> None:
+    """Test placing notes across all participants"""
+
+    alice = "Alice"
+    bob = "Bob"
+    charlie = "Charlie"
+    with string_io() as file_like, Diagram(
+        file_like,
+    ) as sequence:
+        (
+            sequence.message(alice, bob, "m1")
+            .message(bob, charlie, "m2")
+            .participant_note(
+                [alice, charlie], 'Old method for note over all part. with:\n ""note over //FirstPart, LastPart//"".'
+            )
+            .note_across('New method with:\n""note across""')
+            .message(bob, alice)
+            .note_across("Note across all part.", shape="hexagon")
+        )
+
+    expected_output = """\
+@startuml
+Alice -> Bob: m1
+Bob -> Charlie: m2
+note over Alice, Charlie: Old method for note over all part. with:\\n ""note over //FirstPart, LastPart//"".
+note across: New method with:\\n""note across""
+Bob -> Alice
+hnote across: Note across all part.
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
+
+
+def test_invalid_note_shape() -> None:
+    """Test that invalid note shapes raise value errors"""
+    with pytest.raises(ValueError), string_io() as file_like, Diagram(file_like) as sequence:
+        sequence.message("bob", "alice", note="important message", note_shape="circle")
+
+    with pytest.raises(ValueError), string_io() as file_like, Diagram(file_like) as sequence:
+        sequence.note_across("important message", shape="circle")
+
+    with pytest.raises(ValueError), string_io() as file_like, Diagram(file_like) as sequence:
+        sequence.participant_note("bob", "important message", shape="circle")

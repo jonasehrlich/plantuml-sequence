@@ -4,7 +4,7 @@ import dataclasses
 import functools
 import sys
 from types import TracebackType
-from typing import Literal, TextIO, Type, TypeAlias, TypeVar
+from typing import Literal, TextIO, Type, TypeAlias
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -19,10 +19,11 @@ ParticipantShape: TypeAlias = Literal[
     "participant", "actor", "boundary", "control", "entity", "database", "collections", "queue"
 ]
 
+NoteShape: TypeAlias = Literal["default", "rectangle", "hexagon"]
+MessageNotePosition: TypeAlias = Literal["left", "right"]
+ParticipantNotePosition: TypeAlias = Literal["over"] | MessageNotePosition
+_NOTE_SHAPE_COMMAND_MAP: dict[NoteShape, str] = {"default": "note", "rectangle": "rnote", "hexagon": "hnote"}
 GroupType: TypeAlias = Literal["alt", "else", "opt", "loop", "par", "break", "critical", "group"]
-
-
-T = TypeVar("T", bound=TextIO)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -32,16 +33,20 @@ class Participant:
     title: str
     shape: ParticipantShape
     alias: str = ""
-    color: str = ""
+    background_color: str | None = None
 
     def __post_init__(self) -> None:
         if not self.alias:
             object.__setattr__(self, "alias", "".join(filter(str.isalnum, self.title)))
 
     def __str__(self) -> str:
-        quoted_title = utils.maybe_quote(utils.escape_newlines(self.title))
+        quoted_title = utils.maybe_quote(self.title)
         alias_suffix = "" if self.title == self.alias else f" as {self.alias}"
-        return f"{self.shape} {quoted_title}{alias_suffix} {self.color}"
+
+        return f"{self.shape} {quoted_title}{alias_suffix}{_format_color_cmd(self.background_color)}"
+
+
+ParticipantOrName: TypeAlias = Participant | str
 
 
 class Diagram:
@@ -133,11 +138,15 @@ class Diagram:
 
     def message(
         self,
-        participant1: Participant | str | None,
-        participant2: Participant | str | None,
+        participant1: ParticipantOrName | None,
+        participant2: ParticipantOrName | None,
         msg: str | None = None,
         *,
         arrow_style: str | None = None,
+        note: str | None = None,
+        note_shape: NoteShape = "default",
+        note_position: MessageNotePosition = "right",
+        note_background_color: str | None = None,
     ) -> Self:
         """
         Create a message between *participant1* and *participant2*
@@ -150,16 +159,31 @@ class Diagram:
         :type msg: str | None, optional
         :param arrow_style: Override the arrow style to use, could be used for colored arrows, defaults to None
         :type arrow_style: str | None, optional
+        :param note: Note to add left or right of the message, defaults to None
+        :type note: str | None, optional
+        :param note_shape: Shape of the note to add to the message, defaults to "default"
+        :type note_shape: NoteShape, optional
+        :param note_position: Position of the note relative to the message, defaults to "right"
+        :type note_position: MessageNotePosition, optional
+        :param note_background_color: Background color of the note relative to the message, defaults to None
+        :type note_background_color: str, optional
         :return: Sequence diagram object for chaining
         :rtype: Self
         """
         message_suffix = ""
         if msg:
             message_suffix = f": {utils.escape_newlines(msg)}"
-        participant1 = participant_to_string(participant1)
-        participant2 = participant_to_string(participant2)
+        participant1 = _participant_to_string(participant1)
+        participant2 = _participant_to_string(participant2)
         arrow_style = arrow_style or self._arrow_style
         self._line_writer.writeline(f"{participant1} {arrow_style} {participant2}{message_suffix}")
+        if note:
+            self._line_writer.writeline(
+                (
+                    f"{self._note_shape_to_command(note_shape)} {note_position}"
+                    f"{_format_color_cmd(note_background_color)}: {utils.escape_newlines(note)}"
+                )
+            )
         return self
 
     def _declare_some_participant(
@@ -184,7 +208,7 @@ class Diagram:
         """
         alias = alias or ""
         color = color or ""
-        participant = Participant(title=title, shape=shape, alias=alias, color=color)
+        participant = Participant(title=utils.escape_newlines(title), shape=shape, alias=alias, background_color=color)
 
         if participant.alias in self._participants:
             raise ValueError(f"Participant with alias '{participant.alias}' already exists")
@@ -208,9 +232,8 @@ class Diagram:
         :rtype: Iterator[collections.abc.Generator[Self, None, None]]
         """
         title = f' "{title}"' if title else ""
-        background_color = " " + background_color if background_color else ""
 
-        self._line_writer.writeline(f"box{title}{background_color}")
+        self._line_writer.writeline(f"box{title}{_format_color_cmd(background_color)}")
         try:
             yield self
         finally:
@@ -293,15 +316,15 @@ class Diagram:
 
     @contextlib.contextmanager
     def active_lifeline(
-        self, participant: Participant | str, color: str = "", destroy: bool = False
+        self, participant: ParticipantOrName, color: str | None = None, destroy: bool = False
     ) -> collections.abc.Generator[Self, None, None]:
         """
         Contextmanager to activate the lifeline of a participant
 
         :param participant: Participant to activate
         :type participant: Participant | str
-        :param color: Color of the active lifeline, defaults to ""
-        :type color: str, optional
+        :param color: Color of the active lifeline, defaults to None
+        :type color: str | None, optional
         :param destroy: Whether to destroy or deactivate the lifeline at the end of the context, defaults to False
         :type destroy: bool, optional
         :yield: Sequence diagram instance
@@ -316,48 +339,45 @@ class Diagram:
             else:
                 self.deactivate_lifeline(participant)
 
-    def activate_lifeline(self, participant: Participant | str, color: str = "") -> Self:
+    def activate_lifeline(self, participant: ParticipantOrName, color: str | None = None) -> Self:
         """
         Activate the lifeline of `participant`
 
         :param participant: Participant to activate
         :type participant: Participant | str
-        :param color: Color of the active lifeline, defaults to ""
-        :type color: str, optional
+        :param color: Color of the active lifeline, defaults to None
+        :type color: str | None, optional
         :return: Sequence diagram instance
         :rtype: Self
         """
-        alias = participant_to_string(participant)
-        self._line_writer.writeline(f"activate {alias} {color}")
+        alias = _participant_to_string(participant)
+        color = _format_color_cmd(color)
+        self._line_writer.writeline(f"activate {alias}{color}")
         return self
 
-    def deactivate_lifeline(self, participant: Participant | str) -> Self:
+    def deactivate_lifeline(self, participant: ParticipantOrName) -> Self:
         """
         Deactivate the lifeline of `participant`
 
         :param participant: Participant to activate
         :type participant: Participant | str
-        :param color: Color of the active lifeline, defaults to ""
-        :type color: str, optional
         :return: Sequence diagram instance
         :rtype: Self
         """
-        alias = participant_to_string(participant)
+        alias = _participant_to_string(participant)
         self._line_writer.writeline(f"deactivate {alias}")
         return self
 
-    def destroy_lifeline(self, participant: Participant | str) -> Self:
+    def destroy_lifeline(self, participant: ParticipantOrName) -> Self:
         """
         Deactivate the lifeline of `participant`
 
         :param participant: Participant to activate
         :type participant: Participant | str
-        :param color: Color of the active lifeline, defaults to ""
-        :type color: str, optional
         :return: Sequence diagram instance
         :rtype: Self
         """
-        alias = participant_to_string(participant)
+        alias = _participant_to_string(participant)
         self._line_writer.writeline(f"destroy {alias}")
         return self
 
@@ -397,12 +417,105 @@ class Diagram:
         :return: Sequence diagram instance
         :rtype: Self
         """
-        msg = f" {msg} " if msg else ""
+        msg = f" {utils.escape_newlines(msg)} " if msg else ""
         self._line_writer.writeline(f"=={msg}==")
         return self
 
+    def participant_note(
+        self,
+        participants: collections.abc.Sequence[ParticipantOrName] | ParticipantOrName,
+        msg: str,
+        shape: NoteShape = "default",
+        position: ParticipantNotePosition = "over",
+        background_color: str | None = None,
+    ) -> Self:
+        """
+        Place a note relative to a participant
 
-def participant_to_string(participant: Participant | str | None) -> str:
+        .. warning::
+           Notes can only placed `over` multiple participants, if
+
+        :param participants: Participant or sequence of participant definitions
+        :type participants: collections.abc.Sequence[ParticipantOrName] | ParticipantOrName
+        :param msg: Message of the note
+        :type msg: str
+        :param shape: Shape of the note, defaults to "default"
+        :type shape: NoteShape, optional
+        :param position: Position of the note relative to the participant, defaults to "over"
+        :type position: ParticipantNotePosition, optional
+        :param background_color: Background color of the note, defaults to None
+        :type background_color: str | None, optional
+        :raises ValueError: Raised if a note should be placed left or right of multiple participants
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+        if isinstance(participants, (str, Participant)):
+            participants = [participants]
+        aliases = ", ".join(_participant_to_string(participant) for participant in participants)
+        note_cmd = self._note_shape_to_command(shape)
+        background_color = _format_color_cmd(background_color)
+
+        if position == "over":
+            position_cmd: str = position
+        else:
+            position_cmd = f"{position} of"
+            if len(participants) > 1:
+                raise ValueError(f"Cannot add a note {position_cmd} multiple participants")
+
+        self._line_writer.writeline(
+            f"{note_cmd} {position_cmd} {aliases}{background_color}: {utils.escape_newlines(msg)}"
+        )
+        return self
+
+    def note_across(self, msg: str, shape: NoteShape = "default", background_color: str | None = None) -> Self:
+        """
+        Create a note across all participants
+
+        :param msg: Message of the note
+        :type msg: str
+        :param shape: Shape of the note, defaults to "default"
+        :type shape: NoteShape, optional
+        :param background_color: Background color of the note, defaults to None
+        :type background_color: str | None, optional
+        :return: Sequence diagram instance
+        :rtype: Self
+        """
+        note_cmd = self._note_shape_to_command(shape)
+        background_color = _format_color_cmd(background_color)
+        self._line_writer.writeline(f"{note_cmd} across{background_color}: {utils.escape_newlines(msg)}")
+        return self
+
+    def _note_shape_to_command(self, shape: NoteShape) -> str:
+        """
+        Transform a note shape to a command
+
+        :param shape: Shape of the note
+        :type shape: NoteShape
+        :raises ValueError: Raised for invalid note shapes
+        :return: Command to create a note with this shape
+        :rtype: str
+        """
+        try:
+            return _NOTE_SHAPE_COMMAND_MAP[shape]
+        except KeyError as exc:
+            raise ValueError(f"Invalid note shape '{shape}'") from exc
+
+
+def _format_color_cmd(color: str | None) -> str:
+    """
+    Format a color
+
+    The formatting prepends a space and a hash mark
+
+    :param color: Name of the color or hex code
+    :type color: str | None
+    :return: Formatted command for the color
+    :rtype: str
+    """
+    return f" #{color}" if color else ""
+
+
+def _participant_to_string(participant: ParticipantOrName | None) -> str:
     """
     Create a string representation of a participant
 
