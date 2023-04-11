@@ -1,6 +1,6 @@
 # plantuml-sequence
 
-Create PlantUML sequence charts programmatically from Python
+Create PlantUML sequence diagrams programmatically from Python.
 
 The basic example of the [PlantUML Documentation](https://plantuml.com/sequence-diagram) can be implemented with the
 following Python script:
