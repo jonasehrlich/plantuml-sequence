@@ -18,8 +18,8 @@ jobs:
       - name: Load cached Poetry installation
         uses: actions/cache@v3
         with:
-          path: ~/.local  # the path depends on the OS
-          key: dotlocal-poetry-${{ env.POETRY_VERSION }}
+          path: ~/.local
+          key: ${{ runner.os }}-dotlocal-poetry-${{ env.POETRY_VERSION }}
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
@@ -28,16 +28,16 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Check poetry availability
+          key: ${{ runner.os }}-poetry-venv-${{ hashFiles('poetry.lock') }}
+      - name: Check Poetry availability
         run: poetry --version
       - name: Install dependencies with poetry
         run: poetry install
       - name: Lint with ruff
         run: |
-          # stop the build if there are Python syntax errors or undefined names
+          # Stop the build if there are Python syntax errors or undefined names
           poetry run ruff --format=github --select=E9,F63,F7,F82 --target-version=py310 .
-          # default set of ruff rules with GitHub Annotations
+          # Default set of ruff rules with GitHub Annotations
           poetry run ruff --format=github --target-version=py310 .
       - name: Static type checking with mypy
         run: |
