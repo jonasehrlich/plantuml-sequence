@@ -1,8 +1,8 @@
-name: Python package
+name: test
 
 on: [push]
 jobs:
-  build:
+  test:
     env:
       POETRY_VERSION: "1.4.0"
     runs-on: ubuntu-latest
