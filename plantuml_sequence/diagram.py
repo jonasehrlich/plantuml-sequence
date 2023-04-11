@@ -53,11 +53,12 @@ class Diagram:
     """
     Core sequence diagram object
 
-    Create the object and use it as a contextmanager.
+    Create the object and use it as a contextmanager. This ensures that the ``@startuml`` and ``@enduml``
+    commands are written correctly.
 
     .. code-block:: python
 
-       with open("my-diagram.puml", "w") as f, SequenceDiagram(f) as diagram:
+       with open("my-diagram.puml", "w") as f, Diagram(f) as diagram:
           diagram.message("Alice", "Bob", "Hello World!")
 
     """
