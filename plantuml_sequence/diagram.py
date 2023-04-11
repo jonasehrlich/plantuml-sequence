@@ -8,7 +8,7 @@ from typing import Literal, TextIO, Type, TypeAlias
 
 if sys.version_info >= (3, 11):
     from typing import Self
-else:
+else:  # pragma: no cover
     from typing_extensions import Self
 
 from . import utils
@@ -177,6 +177,7 @@ class Diagram:
         participant2 = _participant_to_string(participant2)
         arrow_style = arrow_style or self._arrow_style
         self._line_writer.writeline(f"{participant1} {arrow_style} {participant2}{message_suffix}")
+
         if note:
             self._line_writer.writeline(
                 (

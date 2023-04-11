@@ -30,6 +30,19 @@ Alice <-- Bob: Another authentication Response
     )
 
 
+def test_declare_duplicate_participant_raises() -> None:
+    """Test that declaring two participants with the same alias raises an error"""
+    with string_io() as file_like, Diagram(file_like) as sequence:
+        sequence.declare_participant("Participant", alias="Foo")
+        with pytest.raises(ValueError):
+            sequence.declare_participant("Participant", alias="Foo")
+
+    with string_io() as file_like, Diagram(file_like) as sequence:
+        sequence.declare_participant("Participant")
+        with pytest.raises(ValueError):
+            sequence.declare_participant("Participant")
+
+
 def test_declaring_participant() -> None:
     with string_io() as file_like, Diagram(file_like) as sequence:
         participants = [
@@ -113,6 +126,26 @@ Alice <- Alice: This is a signal to self.\\nIt also demonstrates\\nmultiline \\n
 
         content = file_like.read()
         assert content == expected_output
+
+
+def test_message_from_edge() -> None:
+    with string_io() as file_like, Diagram(file_like) as sequence:
+        sequence.message(None, "Alice", msg="from left edge")
+        sequence.message("Alice", None, msg="from right edge", arrow_style="<-")
+
+        sequence.message(None, "Alice", msg="to left edge", arrow_style="<-")
+        sequence.message("Alice", None, msg="to right edge")
+
+    expected_output = """\
+@startuml
+-> Alice: from left edge
+Alice <- : from right edge
+<- Alice: to left edge
+Alice -> : to right edge
+@enduml
+"""
+    content = file_like.read()
+    assert content == expected_output
 
 
 def test_arrow_style_contextmanager() -> None:
