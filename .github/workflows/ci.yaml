@@ -1,8 +1,8 @@
-name: test
+name: Python package
 
 on: [push]
 jobs:
-  test:
+  build:
     env:
       POETRY_VERSION: "1.4.0"
     runs-on: ubuntu-latest
@@ -14,20 +14,17 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      # Try loading the Poetry installation from cache
       - name: Load cached Poetry installation
-        id: cached-poetry-installation
         uses: actions/cache@v3
         with:
           path: ~/.local
-          key: ${{ runner.os }}-dotlocal-dir-poetry${{ env.POETRY_VERSION }}-py${{ matrix.python-version }}
-      # Install Poetry if the ~/.local cache does not exist
+          key: ${{ runner.os }}-dotlocal-poetry-${{ env.POETRY_VERSION }}
       - name: Install Poetry
-        if: steps.cached-poetry-installation.outputs.cache-hit != 'true'
         uses: snok/install-poetry@v1
         with:
           version: ${{ env.POETRY_VERSION }}
-      # Try loading Poetry venv from cache
+      - name: Check Poetry availability
+        run: poetry --version
       - name: Load cached Poetry environment
         uses: actions/cache@v3
         with:
