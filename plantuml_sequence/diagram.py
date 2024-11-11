@@ -41,9 +41,10 @@ class Participant:
 
     def __str__(self) -> str:
         quoted_title = utils.maybe_quote(self.title)
+
         alias_suffix = "" if self.title == self.alias else f" as {self.alias}"
 
-        return f"{self.shape} {quoted_title}{alias_suffix}{_format_color_cmd(self.background_color)}"
+        return f"{self.shape} {utils.escape_newlines(quoted_title)}{alias_suffix}{_format_color_cmd(self.background_color)}"
 
 
 ParticipantOrName: TypeAlias = Participant | str

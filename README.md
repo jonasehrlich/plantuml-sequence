@@ -59,7 +59,7 @@ Not all of the features of message sequence charts are supported yet. See the li
 ### Participants
 
 * [x] Declaring participants
-* [ ] Multiline participants
+* [x] Multiline participants
 * [ ] Create participant with message
 * [x] Lifeline activation / deactivation
 * [ ] Lifeline auto-activate

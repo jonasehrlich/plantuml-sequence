@@ -107,6 +107,25 @@ Bob -> L: Log transaction
     assert content == expected_output
 
 
+def test_declaring_multiline_participant() -> None:
+    with string_io() as file_like, Diagram(file_like) as sequence:
+        sequence.declare_participant("bob")
+        sequence.declare_participant("I have a really\nlong name", alias="L", color="99FF99")
+        sequence.blank_line()
+        sequence.message("bob", "L", "Log transaction")
+    content = file_like.read()
+
+    expected_output = """\
+@startuml
+participant bob
+participant "I have a really\\nlong name" as L #99FF99
+
+bob -> L: Log transaction
+@enduml
+"""
+    assert content == expected_output
+
+
 def test_message_to_self() -> None:
     """Test sending of long messages from a participant to itself"""
     msg = "This is a signal to self.\nIt also demonstrates\nmultiline \ntext"
