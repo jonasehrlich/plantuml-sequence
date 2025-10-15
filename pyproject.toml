@@ -74,6 +74,7 @@ line_length = 120
 src_paths = ["plantuml_sequence", "test"]
 
 [tool.mypy]
+packages = ["plantuml_sequence"]
 strict = true
 
 [tool.ruff]

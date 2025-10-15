@@ -26,6 +26,6 @@ jobs:
       - name: Lint with ruff
         run: uv run ruff check --output-format github .
       - name: Static type checking with mypy
-        run: uv run mypy plantuml_sequence
+        run: uv run mypy
       - name: Test with pytest
         run: uv run pytest --cov
