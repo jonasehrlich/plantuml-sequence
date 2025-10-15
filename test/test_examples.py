@@ -632,9 +632,12 @@ Bob --> Alice: Authentication Response
 
 def test_some_other_notes() -> None:
     """Test notes relative to participants, across all participants with and without colors"""
-    with string_io() as file_like, Diagram(
-        file_like,
-    ) as sequence:
+    with (
+        string_io() as file_like,
+        Diagram(
+            file_like,
+        ) as sequence,
+    ):
         alice = sequence.declare_participant("Alice")
         bob = sequence.declare_participant("Bob")
         sequence.participant_note(
@@ -664,9 +667,13 @@ note over Alice, Bob #FFAAAA: This is displayed\\nover Bob and Alice.
 def test_note_multiple_participants_left_and_right_raises() -> None:
     """Test that the creation of notes `left of` or `right of` multiple participants fails"""
     for position in ("left", "right"):
-        with pytest.raises(ValueError), string_io() as file_like, Diagram(
-            file_like,
-        ) as sequence:
+        with (
+            pytest.raises(ValueError),
+            string_io() as file_like,
+            Diagram(
+                file_like,
+            ) as sequence,
+        ):
             sequence.participant_note(["Alice", "Bob"], "This is displayed\nleft of Alice.", position=position)
 
 
@@ -674,9 +681,12 @@ def test_notes_on_messages() -> None:
     """Test notes relative to messages"""
     alice = "Alice"
     bob = "Bob"
-    with string_io() as file_like, Diagram(
-        file_like,
-    ) as sequence:
+    with (
+        string_io() as file_like,
+        Diagram(
+            file_like,
+        ) as sequence,
+    ):
         (
             sequence.message(alice, bob, "hello", note="this is a first note", note_position="left")
             .blank_line()
@@ -709,9 +719,12 @@ def test_notes_across_all_participants() -> None:
     alice = "Alice"
     bob = "Bob"
     charlie = "Charlie"
-    with string_io() as file_like, Diagram(
-        file_like,
-    ) as sequence:
+    with (
+        string_io() as file_like,
+        Diagram(
+            file_like,
+        ) as sequence,
+    ):
         (
             sequence.message(alice, bob, "m1")
             .message(bob, charlie, "m2")
