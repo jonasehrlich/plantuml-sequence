@@ -53,7 +53,7 @@ else:  # pragma: no cover
 __all__ = ["StrEnum", "LineWriter", "cwd", "temp_cwd", "string_io", "maybe_quote", "escape_newlines"]
 
 
-StrPath: TypeAlias = os.PathLike | str
+StrPath: TypeAlias = os.PathLike[str] | str
 
 
 class LineWriter:
