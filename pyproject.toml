@@ -1,6 +1,6 @@
 [project]
 name = "plantuml-sequence"
-version = "0.5.0"
+version = "0.5.1"
 description = "Create PlantUML sequence diagrams programmatically from Python"
 authors = [{ name = "Jonas Ehrlich", email = "jonas.ehrlich@gmail.com" }]
 requires-python = ">=3.10"
