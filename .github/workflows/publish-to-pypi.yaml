@@ -22,6 +22,8 @@ jobs:
       - name: Install the dependencies
         run: uv sync --locked --all-extras --dev
       - uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
       - name: Build
         run: uv build
       - name: Publish
